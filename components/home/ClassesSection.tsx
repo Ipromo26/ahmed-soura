@@ -51,10 +51,10 @@ export const ClassesSection: React.FC = () => {
   };
 
   return (
-    <section id="cours" className="pt-36 sm:pt-44 pb-28 bg-[#0a0a0a] border-t border-white/10 relative scroll-mt-32">
+    <section id="cours" className="pt-16 sm:pt-36 pb-16 sm:pb-28 bg-[#0a0a0a] border-t border-white/10 relative scroll-mt-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-6">
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900/95 border border-lime/50 text-lime text-xs font-semibold tracking-widest uppercase mb-4 shadow-[0_0_20px_rgba(198,242,59,0.3)]">
               <Calendar className="w-3.5 h-3.5" />

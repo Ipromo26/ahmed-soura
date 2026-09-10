@@ -20,10 +20,10 @@ export const ShopSection: React.FC = () => {
   };
 
   return (
-    <section id="boutique" className="py-24 scroll-mt-28 bg-[#0a0a0a] border-t border-white/10 relative">
+    <section id="boutique" className="py-16 sm:py-24 scroll-mt-28 bg-[#0a0a0a] border-t border-white/10 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-6">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-white/10 text-lime text-xs font-semibold tracking-widest uppercase mb-4">
               <ShoppingBag className="w-3.5 h-3.5" />
@@ -48,11 +48,11 @@ export const ShopSection: React.FC = () => {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {t.shop.items.map((item) => (
             <div
               key={item.id}
-              className="bg-zinc-950 rounded-2xl border border-white/15 overflow-hidden flex flex-col justify-between group hover:border-lime/50 transition-all duration-300"
+              className="bg-zinc-950 rounded-xl sm:rounded-2xl border border-white/15 overflow-hidden flex flex-col justify-between group hover:border-lime/50 transition-all duration-300"
             >
               {/* Product Visual */}
               <div className="relative aspect-square w-full bg-zinc-900 overflow-hidden flex items-center justify-center border-b border-white/5">
@@ -65,14 +65,14 @@ export const ShopSection: React.FC = () => {
                 />
 
                 {item.tag && (
-                  <span className="absolute top-3 left-3 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-lime text-black shadow">
+                  <span className="absolute top-2 left-2 sm:top-3 sm:left-3 text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded bg-lime text-black shadow">
                     {item.tag}
                   </span>
                 )}
               </div>
 
               {/* Product Info */}
-              <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+              <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between space-y-2 sm:space-y-4">
                 <div>
                   <div className="flex items-center justify-between text-xs text-zinc-400 mb-1">
                     <span>{item.categoryLabel || item.category}</span>
@@ -80,17 +80,17 @@ export const ShopSection: React.FC = () => {
                       {item.formattedPrice || `${item.price} €`}
                     </span>
                   </div>
-                  <h3 className="font-serif text-base font-bold text-white group-hover:text-lime transition-colors line-clamp-1">
+                  <h3 className="font-serif text-xs sm:text-base font-bold text-white group-hover:text-lime transition-colors line-clamp-1">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-zinc-400 mt-1.5 line-clamp-2 leading-relaxed">
+                  <p className="hidden sm:block text-xs text-zinc-400 mt-1.5 line-clamp-2 leading-relaxed">
                     {item.desc}
                   </p>
                 </div>
 
                 <button
                   onClick={() => handleAddToCart(item)}
-                  className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-2 ${
+                  className={`w-full py-2 px-2 sm:py-2.5 sm:px-4 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2 ${
                     addedItem === item.id
                       ? "bg-emerald-500 text-white"
                       : "bg-zinc-900 hover:bg-lime hover:text-black text-zinc-200 border border-white/10"

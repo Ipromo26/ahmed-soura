@@ -14,8 +14,8 @@ export const HeroSection: React.FC = () => {
       className="relative min-h-[96vh] flex items-center pt-28 pb-16 overflow-hidden bg-[#080808]"
     >
       {/* Background theatrical lighting effects */}
-      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-lime/10 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-white/[0.03] rounded-full blur-[130px] pointer-events-none" />
+      <div className="hidden sm:block absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-lime/10 rounded-full blur-[150px] pointer-events-none" />
+      <div className="hidden sm:block absolute bottom-10 right-10 w-[500px] h-[500px] bg-white/[0.03] rounded-full blur-[130px] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(198,242,59,0.05),transparent_75%)] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
@@ -99,7 +99,7 @@ export const HeroSection: React.FC = () => {
           {/* Right Area: Dual-Panel Theatrical Composition (Matching Desktop Mockup) */}
           <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-12 gap-5 items-stretch">
             {/* Panel 1 (Center Stage): Ahmed in Green Stage Costume */}
-            <div className="sm:col-span-7 relative min-h-[420px] sm:min-h-[520px] rounded-2xl overflow-hidden border border-white/15 bg-zinc-950 shadow-2xl group">
+            <div className="sm:col-span-7 relative min-h-[350px] sm:min-h-[520px] rounded-2xl overflow-hidden border border-white/15 bg-zinc-950 shadow-2xl group">
               <Image
                 src="/images/ahmed-soura-green.jpg"
                 alt="Ahmed Soura en mouvement scénique"

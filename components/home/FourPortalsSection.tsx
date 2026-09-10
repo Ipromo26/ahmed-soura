@@ -38,7 +38,7 @@ export const FourPortalsSection: React.FC = () => {
   ];
 
   return (
-    <section id="univers" className="py-24 scroll-mt-28 bg-[#080808] relative overflow-hidden">
+    <section id="univers" className="py-16 sm:py-24 scroll-mt-28 bg-[#080808] relative overflow-hidden">
       {/* Background ambient */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
@@ -58,7 +58,7 @@ export const FourPortalsSection: React.FC = () => {
         </div>
 
         {/* Portals Grid: 4 Interactive Windows */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {portals.map((portal) => {
             const isHovered = hoveredPortal === portal.id;
             const targetUrl = portal.id === "centre" 
@@ -75,7 +75,7 @@ export const FourPortalsSection: React.FC = () => {
                 href={targetUrl}
                 onMouseEnter={() => setHoveredPortal(portal.id)}
                 onMouseLeave={() => setHoveredPortal(null)}
-                className={`group relative h-[450px] sm:h-[500px] rounded-2xl overflow-hidden border border-white/15 bg-zinc-950 transition-all duration-500 flex flex-col justify-end p-6 cursor-pointer ${
+                className={`group relative h-[250px] sm:h-[500px] rounded-xl sm:rounded-2xl overflow-hidden border border-white/15 bg-zinc-950 transition-all duration-300 sm:duration-500 flex flex-col justify-end p-3.5 sm:p-6 cursor-pointer ${
                   isHovered ? "ring-2 ring-lime shadow-[0_0_30px_rgba(198,242,59,0.25)] -translate-y-1.5" : ""
                 }`}
               >
@@ -95,29 +95,29 @@ export const FourPortalsSection: React.FC = () => {
 
                 {/* Top Tag & Portal Number */}
                 <div className="relative z-10 mb-auto flex items-center justify-between">
-                  <span className="text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-md border border-white/10 text-lime">
+                  <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-black/70 backdrop-blur-md border border-white/10 text-lime">
                     {portal.tag}
                   </span>
-                  <span className="text-xs font-mono text-zinc-400">
+                  <span className="text-[10px] sm:text-xs font-mono text-zinc-400">
                     0{portals.indexOf(portal) + 1}
                   </span>
                 </div>
 
                 {/* Content at Bottom */}
-                <div className="relative z-10 space-y-2">
-                  <span className="text-xs font-semibold text-lime uppercase tracking-wider block">
+                <div className="relative z-10 space-y-1 sm:space-y-2">
+                  <span className="text-[10px] sm:text-xs font-semibold text-lime uppercase tracking-wider block line-clamp-1">
                     {portal.subtitle}
                   </span>
-                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-white leading-snug group-hover:text-lime transition-colors">
+                  <h3 className="font-serif text-sm sm:text-xl lg:text-2xl font-bold text-white leading-snug group-hover:text-lime transition-colors line-clamp-2">
                     {portal.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-zinc-300 line-clamp-3 leading-relaxed">
+                  <p className="hidden sm:block text-xs sm:text-sm text-zinc-300 line-clamp-3 leading-relaxed">
                     {portal.description}
                   </p>
 
-                  <div className="pt-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white group-hover:text-lime transition-colors">
+                  <div className="pt-1.5 sm:pt-3 flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white group-hover:text-lime transition-colors">
                     <span>{portal.linkText}</span>
-                    <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </div>
                 </div>
               </Link>

@@ -39,10 +39,10 @@ export const GallerySection: React.FC = () => {
   };
 
   return (
-    <section id="galerie" className="py-24 scroll-mt-28 bg-[#080808] border-t border-white/10 relative">
+    <section id="galerie" className="py-16 sm:py-24 scroll-mt-28 bg-[#080808] border-t border-white/10 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 gap-6">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-white/10 text-lime text-xs font-semibold tracking-widest uppercase mb-4">
               <Camera className="w-3.5 h-3.5" />
@@ -68,7 +68,7 @@ export const GallerySection: React.FC = () => {
         </div>
 
         {/* Filter Badges */}
-        <div className="flex flex-wrap items-center gap-2 mb-10">
+        <div className="flex flex-wrap items-center gap-2 mb-6 sm:mb-10">
           <button
             onClick={() => setSelectedFilter("all")}
             className={`px-4 py-1.5 rounded-full text-xs uppercase tracking-wider font-semibold transition-all ${
@@ -112,12 +112,12 @@ export const GallerySection: React.FC = () => {
         </div>
 
         {/* Editorial Masonry / Dynamic Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {filteredItems.map((item, index) => (
             <div
               key={item.id}
               onClick={() => openLightbox(index)}
-              className="group relative aspect-[3/4] rounded-2xl overflow-hidden bg-zinc-900 border border-white/15 cursor-pointer shadow-lg hover:border-lime/60 transition-all duration-500"
+              className="group relative aspect-[3/4] rounded-xl sm:rounded-2xl overflow-hidden bg-zinc-900 border border-white/15 cursor-pointer shadow-lg hover:border-lime/60 transition-all duration-300 sm:duration-500"
             >
               <Image
                 src={item.src}
@@ -129,7 +129,7 @@ export const GallerySection: React.FC = () => {
               />
 
               {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 sm:p-5">
                 <span className="text-[10px] uppercase font-bold text-lime tracking-widest block mb-1">
                   {item.category}
                 </span>

@@ -10,7 +10,7 @@ export const AboutSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"training" | "awards" | "collabs">("training");
 
   return (
-    <section id="a-propos" className="py-24 scroll-mt-28 bg-[#0a0a0a] border-t border-white/10 relative overflow-hidden">
+    <section id="a-propos" className="py-16 sm:py-24 scroll-mt-28 bg-[#0a0a0a] border-t border-white/10 relative overflow-hidden">
       {/* Glow */}
       <div className="absolute top-1/2 right-0 w-80 h-80 bg-lime/5 rounded-full blur-3xl pointer-events-none" />
 

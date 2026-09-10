@@ -74,7 +74,7 @@ ${formState.message}`;
   };
 
   return (
-    <section id="contact" className="py-24 scroll-mt-28 bg-[#0a0a0a] border-t border-white/10 relative">
+    <section id="contact" className="py-16 sm:py-24 scroll-mt-28 bg-[#0a0a0a] border-t border-white/10 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">

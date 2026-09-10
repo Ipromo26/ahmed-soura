@@ -19,7 +19,7 @@ export const DonationSection: React.FC = () => {
   };
 
   return (
-    <section id="soutenir" className="py-24 scroll-mt-28 bg-[#080808] border-t border-white/10 relative overflow-hidden">
+    <section id="soutenir" className="py-16 sm:py-24 scroll-mt-28 bg-[#080808] border-t border-white/10 relative overflow-hidden">
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-lime/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

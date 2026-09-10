@@ -8,36 +8,46 @@ export const ScrollEffects: React.FC = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
-      setScrollPercent(scrolled);
-      setShowScrollTop(winScroll > 350);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const docEl = document.documentElement;
+          const winScroll = window.scrollY || docEl.scrollTop || document.body.scrollTop || 0;
+          const height = docEl.scrollHeight - docEl.clientHeight;
+          const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+          
+          setScrollPercent(Math.round(scrolled * 10) / 10);
+          setShowScrollTop(winScroll > 400);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
 
     // IntersectionObserver for scroll-reveal animations
+    // Once an element is revealed, we unobserve it so it NEVER disappears
+    // or flickers while scrolling on iOS Safari WebKit.
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("visible");
-          } else if (entry.boundingClientRect.top > 0) {
-            // Re-animate when scrolling back up
-            entry.target.classList.remove("visible");
+            observer.unobserve(entry.target);
           }
         });
       },
       {
-        threshold: 0.12,
-        rootMargin: "0px 0px -40px 0px",
+        threshold: 0.05,
+        rootMargin: "50px 0px 50px 0px",
       }
     );
 
-    const revealElements = document.querySelectorAll(".scroll-reveal, section > div");
+    const revealElements = document.querySelectorAll(".scroll-reveal");
     revealElements.forEach((el) => observer.observe(el));
 
     return () => {
