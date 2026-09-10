@@ -4,6 +4,10 @@
   command = "npm run build"
   publish = ".next"
 
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
+
 # Utilise le plugin officiel Netlify Next.js pour exécuter le SSR et les routes API (/api/bookings, /api/contact)
 [[plugins]]
   package = "@netlify/plugin-nextjs"
