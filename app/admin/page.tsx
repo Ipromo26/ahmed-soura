@@ -59,6 +59,28 @@ import {
   DEFAULT_GALLERY_ITEMS,
 } from "@/lib/catalog-store";
 
+function formatAdminSessionDate(dateStr: string): string {
+  try {
+    const parts = dateStr.split("-");
+    if (parts.length === 3) {
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const d = new Date(year, month, day);
+      if (!isNaN(d.getTime())) {
+        const formatted = d.toLocaleDateString("fr-FR", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+      }
+    }
+  } catch (e) {}
+  return dateStr;
+}
+
 export default function AdminPage() {
   const {
     slots,
@@ -720,15 +742,20 @@ MOTIF RECOMMANDÉ : ${paymentSettings.bankTransferReferenceGuide}`;
   // Direct WhatsApp confirmation to client
   const handleSendClientWhatsApp = (booking: Booking) => {
     const cleanPhone = booking.clientPhone.replace(/[^0-9]/g, "");
+    const formattedBookingDate = formatAdminSessionDate(booking.date);
+    const bookingPrice = booking.totalPrice || (booking.participants > 1 ? (booking.participants * 25) + " €" : "25 €");
     const text =
       "Bonjour " + booking.clientName + " !\n\n" +
-      "C'est Ahmed Soura (Yongonlon). Votre réservation pour le cours :\n" +
+      "C'est Ahmed Soura (Yongonlon). Votre réservation et reçu pour le cours :\n" +
       "• Discipline : " + booking.discipline + "\n" +
-      "• Date : " + booking.date + "\n" +
+      "• Jour & Date : " + formattedBookingDate + "\n" +
       "• Créneau : " + booking.timeSlot + " (" + booking.level + ")\n" +
-      "• Réf : " + booking.id + "\n\n" +
-      "est bien CONFIRMÉE. Hâte de vous retrouver au studio pour partager cette énergie de danse !\n\n" +
-      "À très bientôt,\nAhmed Soura";
+      "• Participants : " + booking.participants + "\n" +
+      "• Tarif Total : " + bookingPrice + "\n" +
+      "• Modalité : " + (booking.paymentStatus || "Règlement sur place au studio") + "\n" +
+      "• N° Reçu Officiel : " + booking.id + "\n\n" +
+      "sont bien CONFIRMÉS. Hâte de vous retrouver au studio 2 de Tanzfabrik Berlin (Möckernstraße 68) pour partager cette belle énergie de danse !\n\n" +
+      "À très bientôt,\nAhmed Soura & l'équipe Yongonlon";
 
     const url = "https://wa.me/" + cleanPhone + "?text=" + encodeURIComponent(text);
     window.open(url, "_blank");
@@ -1508,8 +1535,17 @@ MOTIF RECOMMANDÉ : ${paymentSettings.bankTransferReferenceGuide}`;
                       </div>
                     </div>
 
-                    <div className="text-xs text-zinc-300 bg-white/[0.02] p-2.5 rounded-xl border border-white/5">
-                      <strong className="text-white">{b.discipline}</strong> — {b.date} à {b.timeSlot} ({b.level})
+                    <div className="text-xs text-zinc-300 bg-white/[0.02] p-3 rounded-xl border border-white/5 space-y-1.5">
+                      <div>
+                        <strong className="text-white font-serif text-sm">{b.discipline}</strong> — <span className="text-lime font-bold">{formatAdminSessionDate(b.date)}</span> à <span className="font-mono text-white">{b.timeSlot}</span> ({b.level})
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3 text-[11px] text-zinc-400 pt-1 border-t border-white/5">
+                        <span>Montant : <strong className="text-lime font-bold">{b.totalPrice || (b.participants > 1 ? (b.participants * 25) + " €" : "25 €")}</strong></span>
+                        <span>•</span>
+                        <span>Règlement : <span className="text-emerald-400 font-medium">{b.paymentStatus || "Sur place au studio"}</span></span>
+                        <span>•</span>
+                        <span>Reçu N° : <code className="font-mono text-lime bg-lime/10 px-1.5 py-0.5 rounded text-[10px]">{b.id}</code></span>
+                      </div>
                       {b.notes && (
                         <p className="text-zinc-400 mt-1 italic">« {b.notes} »</p>
                       )}

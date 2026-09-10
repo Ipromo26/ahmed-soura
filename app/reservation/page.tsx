@@ -20,10 +20,37 @@ import {
   ShieldCheck,
   Check,
   MessageCircle,
+  Printer,
+  FileText,
 } from "lucide-react";
 
+/**
+ * Format session date nicely with weekday
+ */
+function formatSessionDate(dateStr: string, locale: "fr" | "en" = "fr"): string {
+  try {
+    const parts = dateStr.split("-");
+    if (parts.length === 3) {
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const d = new Date(year, month, day);
+      if (!isNaN(d.getTime())) {
+        const formatted = d.toLocaleDateString(locale === "en" ? "en-US" : "fr-FR", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+      }
+    }
+  } catch (e) {}
+  return dateStr;
+}
+
 export default function ReservationPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { slots, disciplines, createBooking } = useBooking();
   const activeDisciplines = disciplines && disciplines.length > 0 ? disciplines : t.classes.items;
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -39,6 +66,13 @@ export default function ReservationPage() {
     message: "",
   });
   const [bookingRef, setBookingRef] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Pricing calculations
+  const unitPrice = parseInt(((selectedService as any).price || "25").toString().replace(/[^0-9]/g, "")) || 25;
+  const numParticipants = Number(formData.participants) || 1;
+  const totalAmount = unitPrice * numParticipants;
+  const formattedTotalPrice = `${totalAmount} € (${numParticipants} × ${unitPrice} €)`;
 
   // Slots matching selected date
   const daySlots = slots.filter((s) => s.date === formData.date && s.isOpen);
@@ -55,12 +89,21 @@ export default function ReservationPage() {
     new Set(slots.filter((s) => s.isOpen).map((s) => s.date))
   ).sort().slice(0, 5);
 
-  const handleNext = (e: React.FormEvent) => {
+  const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
     if (currentStep < 5) {
       setCurrentStep(currentStep + 1);
     } else if (currentStep === 5) {
-      const newRef = createBooking({
+      setIsSubmitting(true);
+      const generatedRef = "AS-" + Math.floor(100000 + Math.random() * 900000);
+      setBookingRef(generatedRef);
+
+      const paymentStatusText = lang === "en" 
+        ? "Payable on site at studio (Cash / Card) — Guaranteed" 
+        : "Règlement sur place au studio (Espèces / Carte) — Garanti";
+
+      createBooking({
+        id: generatedRef,
         clientName: formData.name,
         clientEmail: formData.email,
         clientPhone: formData.phone,
@@ -68,11 +111,39 @@ export default function ReservationPage() {
         date: formData.date,
         timeSlot: formData.timeSlot,
         level: formData.level,
-        participants: Number(formData.participants) || 1,
+        participants: numParticipants,
+        totalPrice: formattedTotalPrice,
+        paymentStatus: paymentStatusText,
         notes: formData.message,
       });
-      setBookingRef(newRef);
-      setCurrentStep(6);
+
+      // Dispatch real confirmation & official receipt emails in background
+      try {
+        await fetch("/api/bookings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            bookingId: generatedRef,
+            clientName: formData.name,
+            clientEmail: formData.email,
+            clientPhone: formData.phone,
+            discipline: selectedService.title,
+            date: formData.date,
+            timeSlot: formData.timeSlot,
+            level: formData.level,
+            participants: numParticipants,
+            totalPrice: formattedTotalPrice,
+            paymentStatus: paymentStatusText,
+            notes: formData.message,
+            locale: lang,
+          }),
+        });
+      } catch (err) {
+        console.warn("[BOOKING DISPATCH]", err);
+      } finally {
+        setIsSubmitting(false);
+        setCurrentStep(6);
+      }
     }
   };
 
@@ -497,43 +568,57 @@ export default function ReservationPage() {
                   <div className="space-y-5">
                     <div className="border-b border-white/10 pb-3">
                       <h2 className="font-serif text-2xl font-bold text-white">
-                        5. Récapitulatif de votre demande
+                        {lang === "en" ? "5. Booking Summary & Verification" : "5. Récapitulatif de votre demande"}
                       </h2>
                       <p className="text-xs text-zinc-400 mt-1">
-                        Vérifiez l'exactitude des informations avant confirmation.
+                        {lang === "en" ? "Check the exact details before issuing your official receipt." : "Vérifiez l'exactitude des informations avant l'émission de votre reçu officiel."}
                       </p>
                     </div>
 
-                    <div className="bg-zinc-900 p-6 rounded-xl border border-white/10 space-y-4 text-sm">
+                    <div className="bg-zinc-900 p-6 rounded-xl border border-white/10 space-y-3.5 text-sm">
                       <div className="flex justify-between border-b border-white/5 pb-2">
                         <span className="text-zinc-400">Discipline :</span>
-                        <span className="font-bold text-white">{selectedService.title}</span>
+                        <span className="font-bold text-white text-right">{selectedService.title}</span>
                       </div>
                       <div className="flex justify-between border-b border-white/5 pb-2">
-                        <span className="text-zinc-400">Date retenue :</span>
-                        <span className="font-semibold text-lime">{formData.date}</span>
+                        <span className="text-zinc-400">{lang === "en" ? "Selected Date :" : "Jour & Date retenue :"}</span>
+                        <span className="font-semibold text-lime text-right">{formatSessionDate(formData.date, lang)}</span>
                       </div>
                       <div className="flex justify-between border-b border-white/5 pb-2">
-                        <span className="text-zinc-400">Horaire :</span>
-                        <span className="text-white">{formData.timeSlot}</span>
+                        <span className="text-zinc-400">{lang === "en" ? "Time Slot :" : "Horaire :"}</span>
+                        <span className="text-white font-mono text-right">{formData.timeSlot}</span>
                       </div>
                       <div className="flex justify-between border-b border-white/5 pb-2">
-                        <span className="text-zinc-400">Participant :</span>
-                        <span className="text-white">{formData.name || "Non renseigné"}</span>
+                        <span className="text-zinc-400">{lang === "en" ? "Location / Studio :" : "Lieu / Studio :"}</span>
+                        <span className="text-zinc-200 text-right text-xs">Tanzfabrik Berlin Studio 2 (Möckernstraße 68)</span>
                       </div>
                       <div className="flex justify-between border-b border-white/5 pb-2">
-                        <span className="text-zinc-400">E-mail de contact :</span>
-                        <span className="text-white">{formData.email || "Non renseigné"}</span>
+                        <span className="text-zinc-400">{lang === "en" ? "Participant(s) :" : "Participant(s) :"}</span>
+                        <span className="text-white text-right">{formData.name || "Non renseigné"} ({numParticipants} pers.)</span>
+                      </div>
+                      <div className="flex justify-between border-b border-white/5 pb-2">
+                        <span className="text-zinc-400">{lang === "en" ? "Contact Email :" : "E-mail de contact :"}</span>
+                        <span className="text-white text-right">{formData.email || "Non renseigné"}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-white/5 pb-2">
+                        <span className="text-zinc-400">{lang === "en" ? "Tariff & Total :" : "Tarif & Total :"}</span>
+                        <span className="font-bold text-lime text-base text-right">{formattedTotalPrice}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-zinc-400">Niveau déclaré :</span>
-                        <span className="uppercase font-semibold text-zinc-200">{formData.level}</span>
+                        <span className="text-zinc-400">{lang === "en" ? "Payment terms :" : "Modalité de règlement :"}</span>
+                        <span className="text-emerald-400 font-semibold text-xs text-right">
+                          {lang === "en" ? "On site at studio (Cash or Card)" : "Sur place au studio (Espèces ou Carte)"}
+                        </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs text-zinc-400">
-                      <ShieldCheck className="w-4 h-4 text-lime" />
-                      <span>Aucun paiement préalable requis. Confirmation transmise par email sous 24h.</span>
+                    <div className="flex items-center gap-2 text-xs text-zinc-400 bg-white/[0.02] p-3 rounded-xl border border-white/5">
+                      <ShieldCheck className="w-5 h-5 text-lime flex-shrink-0" />
+                      <span>
+                        {lang === "en" 
+                          ? "No advance card charge required. Official receipt and studio access details generated instantly." 
+                          : "Aucun paiement préalable requis. Reçu officiel et code d'accès studio envoyés immédiatement par email."}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -547,7 +632,7 @@ export default function ReservationPage() {
                       className="text-xs font-semibold uppercase tracking-wider text-zinc-400 hover:text-white flex items-center gap-1.5"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      <span>Précédent</span>
+                      <span>{lang === "en" ? "Previous" : "Précédent"}</span>
                     </button>
                   ) : (
                     <div />
@@ -555,66 +640,162 @@ export default function ReservationPage() {
 
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-2 bg-lime hover:bg-lime-light text-black font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-full transition-all shadow-[0_0_20px_rgba(198,242,59,0.3)]"
+                    disabled={isSubmitting}
+                    className="inline-flex items-center gap-2 bg-lime hover:bg-lime-light text-black font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-full transition-all shadow-[0_0_20px_rgba(198,242,59,0.3)] disabled:opacity-50"
                   >
-                    <span>{currentStep === 5 ? "Confirmer l'inscription" : "Étape suivante"}</span>
+                    <span>
+                      {isSubmitting
+                        ? (lang === "en" ? "Generating Receipt..." : "Génération du reçu...")
+                        : (currentStep === 5 
+                            ? (lang === "en" ? "Confirm & Generate Official Receipt" : "Confirmer & Générer mon Reçu") 
+                            : (lang === "en" ? "Next Step" : "Étape suivante"))}
+                    </span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </form>
             ) : (
-              /* Step 6: Instant Confirmation State */
-              <div className="text-center py-10 space-y-6">
-                <div className="w-16 h-16 bg-lime/10 text-lime rounded-full flex items-center justify-center mx-auto border border-lime/30">
-                  <Check className="w-8 h-8" />
-                </div>
-
-                <div className="space-y-2">
-                  <span className="text-xs uppercase font-mono tracking-widest text-lime block">
-                    Référence : {bookingRef}
+              /* Step 6: Instant Confirmation State & Printable Official Receipt */
+              <div className="py-6 space-y-6">
+                <div className="text-center space-y-3">
+                  <div className="w-16 h-16 bg-lime/10 text-lime rounded-full flex items-center justify-center mx-auto border border-lime/30 shadow-[0_0_30px_rgba(198,242,59,0.2)]">
+                    <Check className="w-8 h-8" />
+                  </div>
+                  <span className="text-xs uppercase font-mono tracking-widest text-lime block font-bold">
+                    ✓ {lang === "en" ? "OFFICIAL BOOKING RECEIPT CONFIRMED" : "REÇU OFFICIEL DE RÉSERVATION CONFIRMÉ"}
                   </span>
-                  <h2 className="font-serif text-3xl font-bold text-white">
-                    Demande de Réservation Confirmée !
+                  <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white">
+                    {lang === "en" ? "Booking & Receipt Validated!" : "Réservation & Reçu Validés !"}
                   </h2>
-                  <p className="text-sm text-zinc-300 max-w-md mx-auto leading-relaxed">
-                    Merci <strong>{formData.name}</strong>. Votre inscription pour <strong>{selectedService.title}</strong> le <strong>{formData.date}</strong> ({formData.timeSlot}) a bien été enregistrée.
+                  <p className="text-sm text-zinc-300 max-w-lg mx-auto leading-relaxed">
+                    {lang === "en"
+                      ? `Thank you ${formData.name}. Your booking for ${selectedService.title} has been confirmed. A complete receipt has been sent to ${formData.email}.`
+                      : `Merci ${formData.name}. Votre réservation pour ${selectedService.title} a bien été enregistrée. Un reçu officiel complet a été expédié à ${formData.email}.`}
                   </p>
                 </div>
 
-                <div className="p-4 rounded-xl bg-zinc-900 border border-white/10 max-w-md mx-auto text-xs text-zinc-400 text-left space-y-1">
-                  <p className="text-zinc-200 font-semibold">Prochaines étapes :</p>
-                  <p>1. Un récapitulatif a été envoyé à <strong>{formData.email}</strong>.</p>
-                  <p>2. Vous recevrez les informations d'accès studio et tenue requise.</p>
+                {/* Official Receipt Card */}
+                <div className="bg-[#121214] border border-white/15 rounded-2xl p-6 sm:p-8 max-w-xl mx-auto shadow-2xl relative overflow-hidden text-left">
+                  <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-lime via-yellow-400 to-lime" />
+                  
+                  {/* Card Header */}
+                  <div className="flex items-start justify-between border-b border-white/10 pb-4 mb-5">
+                    <div>
+                      <div className="text-[10px] uppercase font-mono tracking-widest text-lime font-bold">
+                        COMPAGNIE AHMED SOURA · YONGONLON
+                      </div>
+                      <h3 className="font-serif text-xl font-bold text-white mt-1">
+                        {selectedService.title}
+                      </h3>
+                      <p className="text-xs text-zinc-400 mt-0.5">
+                        Studio 2 Tanzfabrik Berlin · Möckernstraße 68, 10965 Berlin
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] uppercase font-mono text-zinc-400 block">N° REÇU</span>
+                      <span className="font-mono text-sm sm:text-base font-bold text-lime bg-lime/10 px-2.5 py-1 rounded border border-lime/30 inline-block mt-1">
+                        {bookingRef}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Receipt Details Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs mb-5">
+                    <div className="bg-zinc-900/80 p-3.5 rounded-xl border border-white/5">
+                      <span className="text-zinc-500 uppercase text-[10px] font-mono block mb-1">
+                        📅 {lang === "en" ? "DAY & DATE" : "JOUR & DATE DE SÉANCE"}
+                      </span>
+                      <span className="text-lime font-bold text-sm block">
+                        {formatSessionDate(formData.date, lang)}
+                      </span>
+                      <span className="text-zinc-400 font-mono text-xs mt-0.5 block">
+                        ⏰ {formData.timeSlot}
+                      </span>
+                    </div>
+
+                    <div className="bg-zinc-900/80 p-3.5 rounded-xl border border-white/5">
+                      <span className="text-zinc-500 uppercase text-[10px] font-mono block mb-1">
+                        👤 {lang === "en" ? "PARTICIPANT" : "DANSEUR INSCRIT"}
+                      </span>
+                      <span className="text-white font-bold text-sm block truncate">
+                        {formData.name}
+                      </span>
+                      <span className="text-zinc-400 text-xs block mt-0.5">
+                        {numParticipants} pers. · {formData.level}
+                      </span>
+                    </div>
+
+                    <div className="bg-zinc-900/80 p-3.5 rounded-xl border border-white/5">
+                      <span className="text-zinc-500 uppercase text-[10px] font-mono block mb-1">
+                        💶 {lang === "en" ? "TOTAL TARIFF" : "TARIF & MONTANT TOTAL"}
+                      </span>
+                      <span className="text-lime font-bold text-base block">
+                        {formattedTotalPrice}
+                      </span>
+                      <span className="text-zinc-400 text-[11px] block mt-0.5">
+                        {lang === "en" ? "Guaranteed reservation" : "Réservation garantie"}
+                      </span>
+                    </div>
+
+                    <div className="bg-zinc-900/80 p-3.5 rounded-xl border border-white/5">
+                      <span className="text-zinc-500 uppercase text-[10px] font-mono block mb-1">
+                        💳 {lang === "en" ? "PAYMENT STATUS" : "STATUT DU RÈGLEMENT"}
+                      </span>
+                      <span className="text-emerald-400 font-semibold text-xs block">
+                        ✓ {lang === "en" ? "On site at studio (Cash / Card)" : "Sur place au studio (Espèces / Carte)"}
+                      </span>
+                      <span className="text-zinc-400 text-[11px] block mt-0.5">
+                        {lang === "en" ? "No upfront charge" : "Aucun prélèvement préalable"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Footnote */}
+                  <div className="text-[11px] text-zinc-400 border-t border-white/10 pt-3.5 flex flex-col sm:flex-row justify-between items-center gap-2 text-center sm:text-left">
+                    <span>
+                      💡 Arrivée conseillée : 10 min avant · Tenue confortable
+                    </span>
+                    <span className="font-mono text-zinc-500 text-[10px]">
+                      Émis le {new Date().toLocaleDateString(lang === "en" ? "en-US" : "fr-FR")}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="pt-2 flex justify-center">
+                {/* Direct Action Buttons */}
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-white font-semibold text-xs uppercase tracking-wider transition-all border border-white/15 shadow-md"
+                  >
+                    <Printer className="w-4 h-4 text-lime" />
+                    <span>{lang === "en" ? "Print / Save Receipt (PDF)" : "Imprimer / Enregistrer le Reçu (PDF)"}</span>
+                  </button>
+
                   <a
                     href={`https://wa.me/491637173662?text=${encodeURIComponent(
-                      `Bonjour Ahmed, je viens de réserver ma place pour le cours "${selectedService.title}" le ${formData.date} (${formData.timeSlot}). Référence : ${bookingRef} - Nom : ${formData.name}.`
+                      `Bonjour Ahmed Soura, j'ai bien réservé ma séance pour "${selectedService.title}" le ${formatSessionDate(formData.date, "fr")} (${formData.timeSlot}). Référence Reçu: ${bookingRef} - Nom: ${formData.name}.`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-black font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-[#25D366]/20"
                   >
                     <MessageCircle className="w-4 h-4 fill-black" />
-                    <span>Notifier Ahmed sur WhatsApp (+49 163 717 36 62)</span>
+                    <span>{lang === "en" ? "Message Ahmed on WhatsApp" : "Notifier Ahmed sur WhatsApp"}</span>
                   </a>
                 </div>
 
-                <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
-                  <Link
-                    href="/agenda"
-                    className="px-6 py-3 rounded-full bg-zinc-900 border border-white/15 text-white text-xs uppercase tracking-wider hover:border-lime transition-colors"
+                <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCurrentStep(1);
+                      setBookingRef("");
+                    }}
+                    className="text-xs uppercase tracking-wider text-zinc-400 hover:text-lime underline transition-colors"
                   >
-                    Consulter l'agenda public
-                  </Link>
-
-                  <Link
-                    href="/"
-                    className="px-6 py-3 rounded-full bg-lime text-black font-bold text-xs uppercase tracking-wider hover:bg-lime-light transition-all"
-                  >
-                    Retour à l'accueil
-                  </Link>
+                    {lang === "en" ? "Make another booking" : "Effectuer une autre réservation"}
+                  </button>
                 </div>
               </div>
             )}

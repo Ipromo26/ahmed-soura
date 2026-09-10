@@ -26,6 +26,8 @@ export interface Booking {
   timeSlot: string;
   level: string;
   participants: number;
+  totalPrice?: string;
+  paymentStatus?: string;
   status: "pending" | "confirmed" | "cancelled";
   notes?: string;
   createdAt: string;
@@ -49,7 +51,7 @@ interface BookingContextType {
   addSlot: (slot: Omit<AvailabilitySlot, "id" | "bookedCount">) => void;
   updateSlot: (id: string, updates: Partial<AvailabilitySlot>) => void;
   deleteSlot: (id: string) => void;
-  createBooking: (booking: Omit<Booking, "id" | "createdAt" | "status"> & { status?: "pending" | "confirmed" | "cancelled"; slotId?: string }) => string;
+  createBooking: (booking: Omit<Booking, "id" | "createdAt" | "status"> & { id?: string; status?: "pending" | "confirmed" | "cancelled"; slotId?: string }) => string;
   updateBookingStatus: (id: string, status: "pending" | "confirmed" | "cancelled") => void;
   deleteBooking: (id: string) => void;
   addDiscipline: (discipline: Omit<DanceDiscipline, "id">) => void;
@@ -200,6 +202,8 @@ const defaultBookings: Booking[] = [
     timeSlot: "18:30 - 20:00",
     level: "Tous niveaux",
     participants: 1,
+    totalPrice: "25 €",
+    paymentStatus: "Règlement sur place au studio",
     status: "confirmed",
     notes: "Souhaite approfondir la coordination rythmique mandingue.",
     createdAt: "2026-09-08T14:32:00Z",
@@ -214,6 +218,8 @@ const defaultBookings: Booking[] = [
     timeSlot: "10:00 - 14:00",
     level: "Avancé & Professionnels",
     participants: 2,
+    totalPrice: "90 € (2 × 45 €)",
+    paymentStatus: "Règlement sur place au studio",
     status: "pending",
     notes: "Danseur contemporain en résidence à Berlin.",
     createdAt: "2026-09-09T09:15:00Z",
@@ -228,6 +234,8 @@ const defaultBookings: Booking[] = [
     timeSlot: "19:00 - 21:00",
     level: "Intermédiaire / Avancé",
     participants: 1,
+    totalPrice: "30 €",
+    paymentStatus: "Règlement sur place au studio",
     status: "pending",
     notes: "Découverte des pas du terroir mossi.",
     createdAt: "2026-09-09T11:40:00Z",
@@ -242,6 +250,8 @@ const defaultBookings: Booking[] = [
     timeSlot: "10:30 - 12:00",
     level: "Sur-mesure (Débutant ou Avancé)",
     participants: 1,
+    totalPrice: "70 €",
+    paymentStatus: "Règlement sur place au studio",
     status: "confirmed",
     notes: "Préparation d'une pièce solo de médiation.",
     createdAt: "2026-09-07T16:20:00Z",
@@ -310,12 +320,14 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     persistSlots(slots.filter((s) => s.id !== id));
   };
 
-  const createBooking = (bookingData: Omit<Booking, "id" | "createdAt" | "status"> & { status?: "pending" | "confirmed" | "cancelled"; slotId?: string }) => {
-    const generatedId = "AS-" + Math.floor(100000 + Math.random() * 900000);
+  const createBooking = (bookingData: Omit<Booking, "id" | "createdAt" | "status"> & { id?: string; status?: "pending" | "confirmed" | "cancelled"; slotId?: string }) => {
+    const generatedId = bookingData.id || ("AS-" + Math.floor(100000 + Math.random() * 900000));
     const newBooking: Booking = {
       ...bookingData,
       id: generatedId,
-      status: bookingData.status || "pending",
+      status: bookingData.status || "confirmed",
+      totalPrice: bookingData.totalPrice || (bookingData.participants > 1 ? `${bookingData.participants * 25} €` : "25 €"),
+      paymentStatus: bookingData.paymentStatus || "Règlement sur place au studio (Espèces / Carte)",
       createdAt: new Date().toISOString(),
     };
     persistBookings([newBooking, ...bookings]);

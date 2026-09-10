@@ -1,20 +1,46 @@
 import { BookingEmailData } from "../types";
 import { renderEmailWrapper } from "./styles";
 
+function formatSessionDate(dateStr: string, locale: "fr" | "en" = "fr"): string {
+  try {
+    const parts = dateStr.split("-");
+    if (parts.length === 3) {
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const d = new Date(year, month, day);
+      if (!isNaN(d.getTime())) {
+        const formatted = d.toLocaleDateString(locale === "en" ? "en-US" : "fr-FR", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+      }
+    }
+  } catch (e) {}
+  return dateStr;
+}
+
 export function renderAdminBookingNotification(data: BookingEmailData): { subject: string; html: string; text: string } {
+  const formattedDate = formatSessionDate(data.date, "fr");
+  const displayPrice = data.totalPrice || "25 € / pers.";
+  const displayPaymentStatus = data.paymentStatus || "Règlement sur place au studio (Espèces / Carte)";
+
   const subject = `🔔 [Yongonlon Admin] Nouvelle Réservation : ${data.clientName} (${data.discipline}) - Réf: ${data.bookingId}`;
-  const preheader = `Nouvelle réservation reçue de ${data.clientName} pour le cours de ${data.discipline} du ${data.date}.`;
+  const preheader = `Nouvelle réservation reçue de ${data.clientName} pour le cours de ${data.discipline} du ${formattedDate}.`;
 
   const htmlContent = `
     <div style="margin-bottom: 20px;">
       <span style="display: inline-block; padding: 4px 10px; background-color: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 9999px; font-size: 11px; font-family: monospace; font-weight: 700; color: #10b981; text-transform: uppercase; margin-bottom: 10px;">
-        ● ALERTE RÉSERVATION ENTRANTES
+        ● ALERTE RÉSERVATION ENTRANTE · REÇU OFFICIEL
       </span>
       <h1 style="font-family: Georgia, serif; font-size: 22px; color: #ffffff; margin: 0 0 8px 0;">
-        Nouvelle Réservation Reçue 🎭
+        Nouvelle Réservation Enregistrée 🎭
       </h1>
       <p style="font-size: 13px; color: #a1a1aa; margin: 0;">
-        Un élève vient d'enregistrer une session depuis le site officiel <strong>ahmedsoura.com</strong>.
+        Un élève vient d'enregistrer une séance et son reçu a été généré avec succès depuis le site officiel <strong>ahmedsoura.com</strong>.
       </p>
     </div>
 
@@ -29,8 +55,8 @@ export function renderAdminBookingNotification(data: BookingEmailData): { subjec
             <div style="font-size: 16px; font-weight: bold; color: #ffffff; margin-top: 2px;">
               ${data.discipline}
             </div>
-            <div style="font-size: 12px; color: #a1a1aa; font-family: monospace;">
-              📅 ${data.date} &nbsp;·&nbsp; ⏰ ${data.timeSlot}
+            <div style="font-size: 12px; color: #c6f23b; font-family: monospace; font-weight: 700; margin-top: 4px;">
+              📅 ${formattedDate} &nbsp;·&nbsp; ⏰ ${data.timeSlot}
             </div>
           </td>
         </tr>
@@ -57,6 +83,24 @@ export function renderAdminBookingNotification(data: BookingEmailData): { subjec
           </td>
         </tr>
         <tr>
+          <td style="padding: 10px 0; border-bottom: 1px solid #222226; font-size: 13px; color: #a1a1aa;">Montant / Tarif :</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid #222226; font-size: 13px; color: #c6f23b; font-weight: 700; text-align: right;">
+            ${displayPrice}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 0; border-bottom: 1px solid #222226; font-size: 13px; color: #a1a1aa;">Modalité de paiement :</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid #222226; font-size: 12px; color: #10b981; font-weight: 600; text-align: right;">
+            ${displayPaymentStatus}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 0; border-bottom: 1px solid #222226; font-size: 13px; color: #a1a1aa;">N° Reçu de référence :</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid #222226; font-size: 12px; color: #c6f23b; font-family: monospace; font-weight: bold; text-align: right;">
+            ${data.bookingId}
+          </td>
+        </tr>
+        <tr>
           <td style="padding: 10px 0; font-size: 13px; color: #a1a1aa;">Langue de la requête :</td>
           <td style="padding: 10px 0; font-size: 13px; color: #c6f23b; text-align: right; text-transform: uppercase; font-family: monospace; font-weight: bold;">
             ${data.locale === "en" ? "🇬🇧 English" : "🇫🇷 Français"}
@@ -78,9 +122,9 @@ export function renderAdminBookingNotification(data: BookingEmailData): { subjec
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px;">
       <tr>
         <td style="padding: 0 6px 0 0; width: 50%;">
-          <a href="https://wa.me/${data.clientPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour ${data.clientName}, Ahmed Soura à l'appareil suite à votre réservation du cours de ${data.discipline}.`)}"
+          <a href="https://wa.me/${data.clientPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour ${data.clientName}, Ahmed Soura (Yongonlon) à l'appareil suite à votre réservation du cours de ${data.discipline} pour le ${formattedDate} (Réf: ${data.bookingId}).`)}"
              style="display: block; text-align: center; background-color: #25D366; color: #ffffff; font-weight: 700; font-size: 12px; padding: 12px; border-radius: 12px; text-decoration: none;">
-            💬 WhatsApp Client
+            💬 WhatsApp Élève
           </a>
         </td>
         <td style="padding: 0 0 0 6px; width: 50%;">
@@ -93,7 +137,15 @@ export function renderAdminBookingNotification(data: BookingEmailData): { subjec
     </table>
   `;
 
-  const text = `NOUVELLE RÉSERVATION YONGONLON\n\nÉlève: ${data.clientName}\nEmail: ${data.clientEmail}\nTél: ${data.clientPhone}\nDiscipline: ${data.discipline}\nDate: ${data.date} (${data.timeSlot})\nRéf: ${data.bookingId}`;
+  const text = `NOUVELLE RÉSERVATION YONGONLON
+
+Élève: ${data.clientName}
+Email: ${data.clientEmail}
+Tél: ${data.clientPhone}
+Discipline: ${data.discipline}
+Date: ${formattedDate} (${data.timeSlot})
+Tarif: ${displayPrice} (${displayPaymentStatus})
+Réf: ${data.bookingId}`;
 
   return { subject, html: renderEmailWrapper(htmlContent, preheader), text };
 }

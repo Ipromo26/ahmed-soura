@@ -12,6 +12,8 @@ export interface BookingEmailData {
   studioName?: string;
   studioAddress?: string;
   totalPrice?: string;
+  paymentStatus?: string;
+  paymentMethod?: string;
   locale?: "fr" | "en";
 }
 
