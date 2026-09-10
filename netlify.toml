@@ -1,0 +1,22 @@
+# Netlify Configuration for Ahmed Soura × Yongonlon Platform (Next.js 14)
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+# Utilise le plugin officiel Netlify Next.js pour exécuter le SSR et les routes API (/api/bookings, /api/contact)
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# En-têtes HTTP de sécurité et de mise en cache
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
