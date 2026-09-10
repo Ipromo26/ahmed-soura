@@ -8,26 +8,22 @@ import { renderClientOrderEmail } from "./templates/order-client";
 import { renderAdminOrderNotification } from "./templates/order-admin";
 
 const ADMIN_NOTIFICATION_EMAIL = process.env.ADMIN_EMAIL || "js.kemet@gmail.com";
-const SENDER_EMAIL = process.env.SMTP_FROM || '"Compagnie Ahmed Soura · Yongonlon" <js.kemet@gmail.com>';
+const SENDER_EMAIL = process.env.SMTP_FROM || '"Compagnie Ahmed Soura · Yongonlon" <ipromo.bf@gmail.com>';
+const REPLY_TO_EMAIL = process.env.REPLY_TO_EMAIL || "js.kemet@gmail.com";
 
-// Create reusable transporter (Gmail SMTP or generic SMTP)
+// Create robust reusable transporter (configured for Gmail SMTP)
 function getTransporter() {
   const host = process.env.SMTP_HOST || "smtp.gmail.com";
-  const port = Number(process.env.SMTP_PORT || 465);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER || "ipromo.bf@gmail.com";
+  const pass = process.env.SMTP_PASS || "abwanfspngsonifw";
 
-  if (user && pass) {
-    return nodemailer.createTransport({
-      host,
-      port,
-      secure: port === 465,
-      auth: { user, pass },
-    });
-  }
-
-  // If no credentials configured yet, return null (triggers simulation mode)
-  return null;
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+  });
 }
 
 export async function sendEmail({
@@ -43,25 +39,18 @@ export async function sendEmail({
 }): Promise<SendEmailResult> {
   const transporter = getTransporter();
 
-  if (!transporter) {
-    // SIMULATION MODE: Safe, non-blocking, logs clearly for development/staging
-    console.log(`[EMAIL SIMULATION] To: ${to} | Subject: "${subject}"`);
-    return {
-      success: true,
-      messageId: "sim_" + Date.now().toString(36),
-      mode: "simulation",
-      recipient: to,
-    };
-  }
-
   try {
     const info = await transporter.sendMail({
       from: SENDER_EMAIL,
+      replyTo: REPLY_TO_EMAIL,
       to,
       subject,
       text,
       html,
     });
+
+    console.log(`[EMAIL SENT TO ${to}] Response: ${info.response} | MessageId: ${info.messageId}`);
+
     return {
       success: true,
       messageId: info.messageId,
@@ -79,7 +68,7 @@ export async function sendEmail({
   }
 }
 
-// 1. Send Booking Confirmation (Client + Admin)
+// 1. Send Booking Confirmation (Client + Admin notification on js.kemet@gmail.com)
 export async function sendBookingEmails(data: BookingEmailData) {
   // A. To Client (in client's locale: fr or en)
   const clientTpl = renderClientBookingEmail(data);
@@ -104,7 +93,7 @@ export async function sendBookingEmails(data: BookingEmailData) {
 
 // 2. Send Contact Message Notification (Client + Admin)
 export async function sendContactEmails(data: ContactEmailData) {
-  // A. To Client (in client's locale: fr or en)
+  // A. To Client
   const clientTpl = renderClientContactEmail(data);
   const clientRes = await sendEmail({
     to: data.email,
