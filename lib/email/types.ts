@@ -36,3 +36,24 @@ export interface SendEmailResult {
   previewUrl?: string;
   error?: string;
 }
+
+export interface OrderEmailData {
+  orderId: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  shippingAddress: string;
+  city?: string;
+  postalCode?: string;
+  country?: string;
+  items: {
+    title: string;
+    quantity: number;
+    price: number;
+  }[];
+  subtotal?: string;
+  shippingCost?: string;
+  totalAmount: string;
+  paymentMethod: string;
+  locale?: "fr" | "en";
+}

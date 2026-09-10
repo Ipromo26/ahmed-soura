@@ -1,9 +1,11 @@
 import nodemailer from "nodemailer";
-import { BookingEmailData, ContactEmailData, SendEmailResult } from "./types";
+import { BookingEmailData, ContactEmailData, OrderEmailData, SendEmailResult } from "./types";
 import { renderClientBookingEmail } from "./templates/booking-client";
 import { renderAdminBookingNotification } from "./templates/booking-admin";
 import { renderClientContactEmail } from "./templates/contact-client";
 import { renderAdminContactNotification } from "./templates/contact-admin";
+import { renderClientOrderEmail } from "./templates/order-client";
+import { renderAdminOrderNotification } from "./templates/order-admin";
 
 const ADMIN_NOTIFICATION_EMAIL = process.env.ADMIN_EMAIL || "js.kemet@gmail.com";
 const SENDER_EMAIL = process.env.SMTP_FROM || '"Compagnie Ahmed Soura · Yongonlon" <js.kemet@gmail.com>';
@@ -113,6 +115,29 @@ export async function sendContactEmails(data: ContactEmailData) {
 
   // B. To Admin (js.kemet@gmail.com)
   const adminTpl = renderAdminContactNotification(data);
+  const adminRes = await sendEmail({
+    to: ADMIN_NOTIFICATION_EMAIL,
+    subject: adminTpl.subject,
+    html: adminTpl.html,
+    text: adminTpl.text,
+  });
+
+  return { clientRes, adminRes };
+}
+
+// 3. Send Boutique Order Confirmation (Client Receipt + Admin Notification)
+export async function sendOrderEmails(data: OrderEmailData) {
+  // A. To Customer
+  const clientTpl = renderClientOrderEmail(data);
+  const clientRes = await sendEmail({
+    to: data.customerEmail,
+    subject: clientTpl.subject,
+    html: clientTpl.html,
+    text: clientTpl.text,
+  });
+
+  // B. To Admin (js.kemet@gmail.com)
+  const adminTpl = renderAdminOrderNotification(data);
   const adminRes = await sendEmail({
     to: ADMIN_NOTIFICATION_EMAIL,
     subject: adminTpl.subject,
