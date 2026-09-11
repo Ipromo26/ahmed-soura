@@ -27,7 +27,7 @@ export function renderAdminOrderNotification(data: OrderEmailData): { subject: s
         Nouvelle Commande Enregistrée 🛍️
       </h1>
       <p style="font-size: 13px; color: #a1a1aa; margin: 0;">
-        Un client vient d'effectuer un achat sur la boutique officielle <strong>ahmedsoura.com</strong>.
+        Un client vient d'effectuer un achat sur la boutique officielle <strong>ahmed-soura.fr</strong>.
       </p>
     </div>
 
@@ -83,7 +83,7 @@ export function renderAdminOrderNotification(data: OrderEmailData): { subject: s
           </a>
         </td>
         <td style="padding: 0 0 0 6px; width: 50%;">
-          <a href="https://ahmedsoura.com/admin"
+          <a href="https://ahmed-soura.fr/admin"
              style="display: block; text-align: center; background-color: #c6f23b; color: #000000; font-weight: 700; font-size: 12px; padding: 12px; border-radius: 12px; text-decoration: none;">
             ⚙️ Ouvrir Admin
           </a>

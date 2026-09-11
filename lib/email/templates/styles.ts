@@ -98,11 +98,11 @@ export function renderEmailWrapper(content: string, preheaderText: string = ""):
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
                 <tr>
                   <td style="padding: 0 8px;">
-                    <a href="https://ahmedsoura.com" style="font-size: 11px; color: #c6f23b; text-decoration: none; font-weight: 600;">Site Officiel</a>
+                    <a href="https://ahmed-soura.fr" style="font-size: 11px; color: #c6f23b; text-decoration: none; font-weight: 600;">Site Officiel</a>
                   </td>
                   <td style="color: #3f3f46; font-size: 11px;">·</td>
                   <td style="padding: 0 8px;">
-                    <a href="https://ahmedsoura.com/cours" style="font-size: 11px; color: #a1a1aa; text-decoration: none;">Cours & Stages</a>
+                    <a href="https://ahmed-soura.fr/cours" style="font-size: 11px; color: #a1a1aa; text-decoration: none;">Cours & Stages</a>
                   </td>
                   <td style="color: #3f3f46; font-size: 11px;">·</td>
                   <td style="padding: 0 8px;">

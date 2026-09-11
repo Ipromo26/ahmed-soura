@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCart } from "@/context/CartContext";
-import { Menu, X, ShoppingBag, Instagram, Facebook, ArrowUpRight } from "lucide-react";
+import { Menu, X, ShoppingBag, Instagram, Facebook, ArrowUpRight, Key } from "lucide-react";
 
 export const Navbar: React.FC = () => {
   const { lang, setLang, t } = useLanguage();
@@ -152,6 +152,16 @@ export const Navbar: React.FC = () => {
             <span>{t.nav.bookClass}</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </a>
+
+          {/* Admin Direct Access Key Button */}
+          <a
+            href="/admin"
+            className="p-2 text-zinc-400 hover:text-lime hover:bg-white/5 border border-white/10 rounded-full transition-all duration-200 hover:border-lime/40"
+            aria-label="Espace Administrateur"
+            title="Espace Administrateur"
+          >
+            <Key className="w-4 h-4" />
+          </a>
         </div>
 
         {/* Mobile Controls (Lang + Cart + Hamburger) */}
@@ -188,6 +198,16 @@ export const Navbar: React.FC = () => {
             </button>
           </div>
 
+          {/* Admin Direct Access Key Button (Mobile) */}
+          <a
+            href="/admin"
+            className="p-2 text-zinc-400 hover:text-lime bg-zinc-900 border border-white/10 rounded-full transition-colors"
+            aria-label="Espace Administrateur"
+            title="Espace Administrateur"
+          >
+            <Key className="w-4 h-4" />
+          </a>
+
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 text-zinc-300 hover:text-white bg-zinc-900 border border-white/10 rounded-full focus:outline-none"
@@ -222,6 +242,15 @@ export const Navbar: React.FC = () => {
               className="w-full text-center bg-lime text-black font-bold text-xs tracking-wider uppercase py-3.5 rounded-full shadow-lg"
             >
               {t.nav.bookClass}
+            </a>
+
+            <a
+              href="/admin"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-lime border border-white/10 text-xs font-bold tracking-wider uppercase py-3 rounded-full transition-colors"
+            >
+              <Key className="w-4 h-4 text-lime" />
+              <span>Espace Administrateur</span>
             </a>
 
             <div className="flex items-center justify-center gap-6 pt-2 text-zinc-400">
