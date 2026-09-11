@@ -21,33 +21,33 @@ export const Navbar: React.FC = () => {
   }, []);
 
   const navLinks = [
-    { href: "/", label: t.nav.home },
-    { href: "/ahmed-soura", label: "Ahmed Soura" },
-    { href: "/cours", label: t.nav.classes },
-    { href: "/centre-interculturel", label: t.nav.yongonlon },
-    { href: "/yongonlon-production", label: t.nav.productions },
-    { href: "/agenda", label: t.nav.agenda },
-    { href: "/boutique", label: t.nav.shop },
-    { href: "/galerie", label: t.nav.gallery },
-    { href: "/dons", label: t.nav.support },
-    { href: "/contact", label: t.nav.contact },
+    { href: "/", label: t.nav.home, shortLabel: t.nav.home },
+    { href: "/ahmed-soura", label: "Ahmed Soura", shortLabel: "Ahmed Soura" },
+    { href: "/cours", label: t.nav.classes, shortLabel: t.nav.classes },
+    { href: "/centre-interculturel", label: t.nav.yongonlon, shortLabel: lang === "en" ? "Center" : "Centre" },
+    { href: "/yongonlon-production", label: t.nav.productions, shortLabel: "Productions" },
+    { href: "/agenda", label: t.nav.agenda, shortLabel: t.nav.agenda },
+    { href: "/boutique", label: t.nav.shop, shortLabel: t.nav.shop },
+    { href: "/galerie", label: t.nav.gallery, shortLabel: t.nav.gallery },
+    { href: "/dons", label: t.nav.support, shortLabel: lang === "en" ? "Donate" : "Dons" },
+    { href: "/contact", label: t.nav.contact, shortLabel: t.nav.contact },
   ];
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "glassmorphism py-3 border-b border-lime/10 shadow-[0_4px_30px_rgba(198,242,59,0.05)] glow-border"
-          : "bg-gradient-to-b from-black/85 via-black/40 to-transparent py-5"
+          ? "glassmorphism py-2 sm:py-2.5 border-b border-lime/10 shadow-[0_4px_30px_rgba(198,242,59,0.05)] glow-border"
+          : "bg-gradient-to-b from-black/90 via-black/50 to-transparent py-2.5 sm:py-3.5"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 xl:px-12 flex items-center justify-between">
+      <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-5 lg:px-6 xl:px-8 flex items-center justify-between gap-2">
         {/* Brand / Logo */}
         <a
           href="/"
-          className="flex items-center gap-3.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-lime"
+          className="flex items-center gap-2 sm:gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-lime shrink-0"
         >
-          <div className="relative w-10 h-10 rounded-sm overflow-hidden bg-white p-0.5 border border-white/20 transition-transform duration-300 group-hover:scale-105 shadow-md">
+          <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-sm overflow-hidden bg-white p-0.5 border border-white/20 transition-transform duration-300 group-hover:scale-105 shadow-md shrink-0">
             <Image
               src="/images/yongonlon-logo.jpg"
               alt="Yongonlon Logo"
@@ -57,49 +57,50 @@ export const Navbar: React.FC = () => {
             />
           </div>
           <div className="flex flex-col">
-            <span className="font-serif text-lg tracking-[0.22em] uppercase font-bold text-white leading-tight">
+            <span className="font-serif text-sm sm:text-base 2xl:text-lg tracking-[0.16em] sm:tracking-[0.2em] uppercase font-bold text-white leading-tight">
               YONGONLON
             </span>
-            <span className="text-[9px] uppercase tracking-widest text-zinc-400 font-sans">
+            <span className="hidden 2xl:block text-[9px] uppercase tracking-widest text-zinc-400 font-sans">
               {t.nav.tagline}
             </span>
           </div>
         </a>
 
         {/* Desktop Navigation */}
-        <nav className="hidden xl:flex items-center gap-2 2xl:gap-3.5" aria-label="Main Navigation">
+        <nav className="hidden xl:flex items-center gap-1 2xl:gap-2.5 shrink-0" aria-label="Main Navigation">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="text-[11px] 2xl:text-xs uppercase tracking-wider text-zinc-300 hover:text-lime transition-colors duration-200 relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-lime hover:after:w-full after:transition-all after:duration-300 font-medium whitespace-nowrap"
+              className="text-[10px] 2xl:text-[11.5px] uppercase tracking-wider text-zinc-300 hover:text-lime transition-colors duration-200 relative py-1 px-1.5 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-lime hover:after:w-full after:transition-all after:duration-300 font-medium whitespace-nowrap"
             >
-              {link.label}
+              <span className="2xl:hidden">{link.shortLabel}</span>
+              <span className="hidden 2xl:inline">{link.label}</span>
             </a>
           ))}
         </nav>
 
-        {/* Action Controls & Lang */}
-        <div className="hidden xl:flex items-center gap-2.5 2xl:gap-3.5 pr-1 2xl:pr-2">
+        {/* Desktop Action Controls (Cart + Lang + CTA + Key) */}
+        <div className="hidden xl:flex items-center gap-1.5 2xl:gap-3 shrink-0">
           {/* Cart Icon trigger */}
           <button
             onClick={openCart}
-            className="relative p-2 text-zinc-300 hover:text-lime transition-colors rounded-full hover:bg-white/5"
+            className="relative p-1.5 2xl:p-2 text-zinc-300 hover:text-lime transition-colors rounded-full hover:bg-white/5"
             aria-label="Ouvrir le panier"
           >
-            <ShoppingBag className="w-5 h-5" />
+            <ShoppingBag className="w-4 h-4 2xl:w-5 2xl:h-5" />
             {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-lime text-black font-bold text-[10px] flex items-center justify-center animate-bounce shadow-md">
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-lime text-black font-bold text-[9px] flex items-center justify-center animate-bounce shadow-md">
                 {totalItems}
               </span>
             )}
           </button>
 
           {/* Language Selector */}
-          <div className="flex items-center bg-zinc-900/90 rounded-full p-1 border border-white/10 text-xs font-semibold">
+          <div className="flex items-center bg-zinc-900/90 rounded-full p-0.5 border border-white/10 text-[10px] 2xl:text-[11px] font-semibold">
             <button
               onClick={() => setLang("fr")}
-              className={`px-2.5 py-1 rounded-full transition-all duration-200 ${
+              className={`px-1.5 2xl:px-2 py-0.5 rounded-full transition-all duration-200 ${
                 lang === "fr"
                   ? "bg-lime text-black font-bold shadow-sm"
                   : "text-zinc-400 hover:text-white"
@@ -108,10 +109,10 @@ export const Navbar: React.FC = () => {
             >
               FR
             </button>
-            <span className="text-zinc-600 px-0.5">|</span>
+            <span className="text-zinc-600 px-0.5 text-[9px]">|</span>
             <button
               onClick={() => setLang("en")}
-              className={`px-2.5 py-1 rounded-full transition-all duration-200 ${
+              className={`px-1.5 2xl:px-2 py-0.5 rounded-full transition-all duration-200 ${
                 lang === "en"
                   ? "bg-lime text-black font-bold shadow-sm"
                   : "text-zinc-400 hover:text-white"
@@ -122,67 +123,34 @@ export const Navbar: React.FC = () => {
             </button>
           </div>
 
-          {/* Social Icons */}
-          <div className="hidden 2xl:flex items-center gap-1 text-zinc-400">
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-1.5 hover:text-lime hover:bg-white/5 rounded-full transition-colors"
-              aria-label="Instagram"
-            >
-              <Instagram className="w-4 h-4" />
-            </a>
-            <a
-              href="https://facebook.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-1.5 hover:text-lime hover:bg-white/5 rounded-full transition-colors"
-              aria-label="Facebook"
-            >
-              <Facebook className="w-4 h-4" />
-            </a>
-          </div>
-
           {/* Primary CTA Button */}
           <a
             href="/reservation"
-            className="flex items-center gap-1.5 bg-lime hover:bg-lime-light text-black font-bold text-[11px] 2xl:text-xs tracking-wider uppercase px-4 py-2 2xl:px-5 2xl:py-2.5 rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(198,242,59,0.25)] hover:shadow-[0_0_25px_rgba(198,242,59,0.45)] transform hover:-translate-y-0.5 whitespace-nowrap mr-1"
+            className="flex items-center gap-1.5 bg-lime hover:bg-lime-light text-black font-bold text-[10px] 2xl:text-xs tracking-wider uppercase px-3 py-1.5 2xl:px-4 2xl:py-2 rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(198,242,59,0.25)] hover:shadow-[0_0_25px_rgba(198,242,59,0.45)] transform hover:-translate-y-0.5 whitespace-nowrap"
           >
-            <span>{t.nav.bookClass}</span>
+            <span className="2xl:hidden">{lang === "en" ? "Book" : "Réserver"}</span>
+            <span className="hidden 2xl:inline">{t.nav.bookClass}</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </a>
 
-          {/* Admin Direct Access Key Button */}
+          {/* Admin Direct Access Key Button (Desktop) */}
           <a
             href="/admin"
-            className="p-2 text-zinc-400 hover:text-lime hover:bg-white/5 border border-white/10 rounded-full transition-all duration-200 hover:border-lime/40"
+            className="p-1.5 2xl:p-2 text-lime hover:text-black bg-zinc-900/90 hover:bg-lime border border-lime/40 hover:border-lime rounded-full transition-all duration-200 shadow-sm flex items-center justify-center group"
             aria-label="Espace Administrateur"
             title="Espace Administrateur"
           >
-            <Key className="w-4 h-4" />
+            <Key className="w-3.5 h-3.5 2xl:w-4 2xl:h-4 transition-transform group-hover:scale-110" />
           </a>
         </div>
 
-        {/* Mobile Controls (Lang + Cart + Hamburger) */}
-        <div className="flex xl:hidden items-center gap-2.5">
-          <button
-            onClick={openCart}
-            className="relative p-2 text-zinc-300 hover:text-lime"
-            aria-label="Panier"
-          >
-            <ShoppingBag className="w-5 h-5" />
-            {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-lime text-black font-bold text-[9px] flex items-center justify-center">
-                {totalItems}
-              </span>
-            )}
-          </button>
-
-          <div className="flex items-center bg-zinc-900/90 rounded-full p-0.5 border border-white/10 text-[11px] font-semibold">
+        {/* Mobile Controls (Lang + Cart + Key + Hamburger) */}
+        <div className="flex xl:hidden items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Mobile Language Selector */}
+          <div className="flex items-center bg-zinc-900/90 rounded-full p-0.5 border border-white/10 text-[10px] font-semibold">
             <button
               onClick={() => setLang("fr")}
-              className={`px-2 py-0.5 rounded-full transition-all ${
+              className={`px-1.5 py-0.5 rounded-full transition-all ${
                 lang === "fr" ? "bg-lime text-black font-bold" : "text-zinc-400"
               }`}
             >
@@ -190,7 +158,7 @@ export const Navbar: React.FC = () => {
             </button>
             <button
               onClick={() => setLang("en")}
-              className={`px-2 py-0.5 rounded-full transition-all ${
+              className={`px-1.5 py-0.5 rounded-full transition-all ${
                 lang === "en" ? "bg-lime text-black font-bold" : "text-zinc-400"
               }`}
             >
@@ -198,22 +166,37 @@ export const Navbar: React.FC = () => {
             </button>
           </div>
 
+          {/* Mobile Cart */}
+          <button
+            onClick={openCart}
+            className="relative p-1.5 text-zinc-300 hover:text-lime"
+            aria-label="Panier"
+          >
+            <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-lime text-black font-bold text-[9px] flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
+          </button>
+
           {/* Admin Direct Access Key Button (Mobile) */}
           <a
             href="/admin"
-            className="p-2 text-zinc-400 hover:text-lime bg-zinc-900 border border-white/10 rounded-full transition-colors"
+            className="p-1.5 text-lime hover:text-black bg-zinc-900/90 hover:bg-lime border border-lime/40 hover:border-lime rounded-full transition-colors flex items-center justify-center"
             aria-label="Espace Administrateur"
             title="Espace Administrateur"
           >
-            <Key className="w-4 h-4" />
+            <Key className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </a>
 
+          {/* Mobile Hamburger Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-zinc-300 hover:text-white bg-zinc-900 border border-white/10 rounded-full focus:outline-none"
+            className="p-1.5 text-zinc-300 hover:text-white bg-zinc-900/90 border border-white/10 rounded-full focus:outline-none flex items-center justify-center"
             aria-label="Ouvrir le menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
           </button>
         </div>
       </div>
@@ -247,7 +230,7 @@ export const Navbar: React.FC = () => {
             <a
               href="/admin"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-lime border border-white/10 text-xs font-bold tracking-wider uppercase py-3 rounded-full transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-lime border border-lime/30 text-xs font-bold tracking-wider uppercase py-3 rounded-full transition-colors"
             >
               <Key className="w-4 h-4 text-lime" />
               <span>Espace Administrateur</span>
