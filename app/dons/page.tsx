@@ -62,6 +62,16 @@ export default function DonsPage() {
     } catch {
       // Keep defaults
     }
+
+    // Fetch dynamic server configuration
+    fetch("/api/config")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.config) {
+          setPaymentSettings((prev) => ({ ...prev, ...data.config }));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const handleCopyIban = (ibanStr: string) => {

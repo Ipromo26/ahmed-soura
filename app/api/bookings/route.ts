@@ -1,10 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendBookingEmails } from "@/lib/email/mailer";
+import fs from "fs";
+import path from "path";
+
+// In-memory fallback in case filesystem is read-only (e.g. some serverless environments)
+let memoryBookings: any[] = [];
+
+function getBookingsFilePath(): string {
+  return path.join(process.cwd(), "data", "bookings.json");
+}
+
+function loadServerBookings(): any[] {
+  try {
+    const file = getBookingsFilePath();
+    if (fs.existsSync(file)) {
+      const data = fs.readFileSync(file, "utf8");
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed)) {
+        memoryBookings = parsed;
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.warn("[BOOKING STORE READ ERROR]", e);
+  }
+  return memoryBookings;
+}
+
+function saveServerBooking(booking: any): void {
+  memoryBookings = [booking, ...memoryBookings.filter((b) => b.id !== booking.id)];
+  try {
+    const file = getBookingsFilePath();
+    const dir = path.dirname(file);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(file, JSON.stringify(memoryBookings, null, 2), "utf8");
+  } catch (e) {
+    console.warn("[BOOKING STORE WRITE ERROR, FALLBACK TO MEMORY]", e);
+  }
+}
 
 export async function GET() {
+  const bookings = loadServerBookings();
   return NextResponse.json({
-    status: "ok",
-    supportedMethods: ["GET", "POST"],
+    success: true,
+    count: bookings.length,
+    bookings,
     description: "Ahmed Soura Booking Engine API Endpoint with Automatic Bilingual Email Confirmations & Receipts",
   });
 }
@@ -48,7 +90,10 @@ export async function POST(req: NextRequest) {
       createdAt: new Date().toISOString(),
     };
 
-    // Dispatch bilingual emails (Official Receipt to Client + Alert to Ahmed Soura / js.kemet@gmail.com)
+    // 1. Persist booking to server store
+    saveServerBooking(bookingData);
+
+    // 2. Dispatch bilingual emails (Official Receipt to Client + Alert to Ahmed Soura / js.kemet@gmail.com)
     let emailDispatch = null;
     try {
       emailDispatch = await sendBookingEmails({

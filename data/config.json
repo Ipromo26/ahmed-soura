@@ -1,0 +1,22 @@
+{
+  "stripeMode": "test",
+  "stripePublishableKey": "",
+  "stripeSecretKey": "",
+  "stripeWebhookSecret": "",
+  "stripeShopPaymentLink": "https://buy.stripe.com/test_ahmedsoura_boutique",
+  "stripeDonationPaymentLink": "https://buy.stripe.com/test_ahmedsoura_dons",
+  "stripeCoursesPaymentLink": "https://buy.stripe.com/test_ahmedsoura_stages",
+  "bankAccountHolder": "Compagnie Yongonlon e.V. / Ahmed Soura",
+  "bankName": "Berliner Sparkasse",
+  "bankIban": "DE89 1005 0000 0123 4567 89",
+  "bankBic": "BELADEBE100",
+  "bankBranchAddress": "Alexanderplatz 2, 10178 Berlin, Allemagne",
+  "bankTransferReferenceGuide": "Mentionner impérativement la référence client (ex: AS-XXXXXX ou REC-YON-XXXX)",
+  "paypalEmail": "paiement@yongonlon.org",
+  "paypalMeLink": "https://paypal.me/AhmedSouraDance",
+  "whatsappOfficialNumber": "+49 163 717 36 62",
+  "whatsappNotificationAlertNumber": "+49 163 717 36 62",
+  "defaultCurrency": "EUR (€)",
+  "adminNotificationEmail": "js.kemet@gmail.com",
+  "senderEmailDisplay": "Compagnie Ahmed Soura · Yongonlon <js.kemet@gmail.com>"
+}

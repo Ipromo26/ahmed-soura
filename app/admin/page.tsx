@@ -95,6 +95,7 @@ export default function AdminPage() {
     addDiscipline,
     updateDiscipline,
     deleteDiscipline,
+    refreshServerBookings,
   } = useBooking();
 
   // Authentication State
@@ -151,7 +152,7 @@ export default function AdminPage() {
   const [emailPreviewType, setEmailPreviewType] = useState<string>("booking-client-fr");
   const [emailTestStatus, setEmailTestStatus] = useState<string>("");
 
-  // Load payment settings on mount
+  // Load payment settings on mount from local storage and backend API
   useEffect(() => {
     try {
       const saved = localStorage.getItem("as_payment_settings");
@@ -161,13 +162,34 @@ export default function AdminPage() {
     } catch {
       // Keep defaults
     }
+
+    // Pull from backend API
+    fetch("/api/config")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.config) {
+          setPaymentSettings((prev) => ({ ...prev, ...data.config }));
+          try {
+            localStorage.setItem("as_payment_settings", JSON.stringify({ ...defaultPaymentSettings, ...data.config }));
+          } catch (e) {}
+        }
+      })
+      .catch(() => {});
   }, []);
 
-  const handleSavePaymentSettings = (e: React.FormEvent) => {
+  const handleSavePaymentSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       localStorage.setItem("as_payment_settings", JSON.stringify(paymentSettings));
-      setSettingsFeedback("Paramètres de paiement et connexions bancaires enregistrés avec succès !");
+
+      // Persist to backend server API
+      await fetch("/api/config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(paymentSettings),
+      });
+
+      setSettingsFeedback("Paramètres de paiement, coordonnées bancaires et WhatsApp enregistrés avec succès sur le serveur !");
       setTimeout(() => setSettingsFeedback(""), 4000);
     } catch {
       setSettingsFeedback("Erreur lors de l'enregistrement des paramètres.");

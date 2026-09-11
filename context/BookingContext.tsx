@@ -58,6 +58,7 @@ interface BookingContextType {
   updateDiscipline: (id: string, updates: Partial<DanceDiscipline>) => void;
   deleteDiscipline: (id: string) => void;
   getSlotsByDate: (date: string) => AvailabilitySlot[];
+  refreshServerBookings: () => Promise<void>;
 }
 
 const defaultDisciplines: DanceDiscipline[] = [
@@ -265,7 +266,32 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [bookings, setBookings] = useState<Booking[]>(defaultBookings);
   const [disciplines, setDisciplines] = useState<DanceDiscipline[]>(defaultDisciplines);
 
-  // Load from localStorage on mount
+  const refreshServerBookings = async () => {
+    try {
+      const res = await fetch("/api/bookings");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.bookings)) {
+          setBookings((prev) => {
+            const map = new Map<string, Booking>();
+            data.bookings.forEach((b: Booking) => map.set(b.id, b));
+            prev.forEach((b: Booking) => {
+              if (!map.has(b.id)) map.set(b.id, b);
+            });
+            const merged = Array.from(map.values());
+            try {
+              localStorage.setItem("as_bookings_data", JSON.stringify(merged));
+            } catch (e) {}
+            return merged;
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("[BOOKING CONTEXT SERVER SYNC ERROR]", e);
+    }
+  };
+
+  // Load from localStorage on mount + sync with backend API
   useEffect(() => {
     try {
       const savedSlots = localStorage.getItem("as_slots_data");
@@ -279,6 +305,8 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } catch (e) {
       console.warn("Could not parse saved booking data:", e);
     }
+
+    refreshServerBookings();
   }, []);
 
   // Save to localStorage whenever state changes
@@ -423,6 +451,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         updateDiscipline,
         deleteDiscipline,
         getSlotsByDate,
+        refreshServerBookings,
       }}
     >
       {children}
