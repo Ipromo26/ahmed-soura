@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 export default function ContactPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
   const [formState, setFormState] = useState({
     name: "",
@@ -58,18 +58,52 @@ export default function ContactPage() {
       return;
     }
 
+    // Also notify via backend API & js.kemet@gmail.com
+    fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: formState.name,
+        email: formState.email,
+        phone: formState.phone,
+        organization: formState.organization,
+        category: formState.category,
+        message: formState.message,
+        locale: lang === "en" ? "en" : "fr",
+      }),
+    }).catch(() => {});
+
     const text = generateWhatsAppMessage();
     const url = "https://wa.me/" + whatsappNumber + "?text=" + encodeURIComponent(text);
     window.open(url, "_blank");
     setStatus("success");
   };
 
-  const handleSendEmail = (e: React.FormEvent) => {
+  const handleSendEmail = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formState.name || !formState.email || !formState.message) {
+      alert("Veuillez renseigner votre nom, email et message.");
+      return;
+    }
     setStatus("submitting");
-    setTimeout(() => {
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formState.name,
+          email: formState.email,
+          phone: formState.phone,
+          organization: formState.organization,
+          category: formState.category,
+          message: formState.message,
+          locale: lang === "en" ? "en" : "fr",
+        }),
+      });
       setStatus("success");
-    }, 1200);
+    } catch {
+      setStatus("success");
+    }
   };
 
   return (
