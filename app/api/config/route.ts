@@ -27,6 +27,7 @@ const DEFAULT_CONFIG = {
   defaultCurrency: "EUR (€)",
   adminNotificationEmail: "js.kemet@gmail.com",
   senderEmailDisplay: "Compagnie Ahmed Soura · Yongonlon <js.kemet@gmail.com>",
+  adminPin: "ahmed2026",
 };
 
 let memoryConfig = { ...DEFAULT_CONFIG };
@@ -70,6 +71,7 @@ export async function GET() {
     ...config,
     stripeSecretKey: config.stripeSecretKey ? "sk_••••••••" : "",
     stripeWebhookSecret: config.stripeWebhookSecret ? "whsec_••••••••" : "",
+    adminPin: config.adminPin ? "••••••••" : "••••••••",
   };
   return NextResponse.json({
     success: true,
@@ -93,6 +95,7 @@ export async function POST(req: NextRequest) {
         ...updated,
         stripeSecretKey: updated.stripeSecretKey ? "sk_••••••••" : "",
         stripeWebhookSecret: updated.stripeWebhookSecret ? "whsec_••••••••" : "",
+        adminPin: updated.adminPin ? "••••••••" : "••••••••",
       },
     });
   } catch (e: any) {

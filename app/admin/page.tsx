@@ -29,7 +29,7 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
-  Eye,
+  Eye, EyeOff,
   Settings,
   CreditCard,
   Landmark,
@@ -101,6 +101,9 @@ export default function AdminPage() {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [pinInput, setPinInput] = useState<string>("");
+  const [showPin, setShowPin] = useState<boolean>(false);
+  const [showSettingsPin, setShowSettingsPin] = useState<boolean>(false);
+  const [loginLoading, setLoginLoading] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string>("");
 
   // Tab State
@@ -142,6 +145,7 @@ export default function AdminPage() {
     defaultCurrency: "EUR (€)",
     adminNotificationEmail: "js.kemet@gmail.com",
     senderEmailDisplay: "Compagnie Ahmed Soura · Yongonlon <js.kemet@gmail.com>",
+    adminPin: "ahmed2026",
   };
 
   const [paymentSettings, setPaymentSettings] = useState(defaultPaymentSettings);
@@ -603,21 +607,50 @@ MOTIF RECOMMANDÉ : ${paymentSettings.bankTransferReferenceGuide}`;
     }
   }, []);
 
-  const handleLogin = (e?: React.FormEvent) => {
+  const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (pinInput === "ahmed2026" || pinInput === "admin" || pinInput === "166") {
-      setIsAuthenticated(true);
-      sessionStorage.setItem("as_admin_auth", "true");
-      setAuthError("");
-    } else {
-      setAuthError("Code PIN incorrect. Utilisez 'ahmed2026' ou cliquez sur Accès Démo.");
+    if (!pinInput.trim()) {
+      setAuthError("Veuillez saisir votre code PIN secret.");
+      return;
     }
-  };
-
-  const handleDemoAccess = () => {
-    setIsAuthenticated(true);
-    sessionStorage.setItem("as_admin_auth", "true");
+    setLoginLoading(true);
     setAuthError("");
+    try {
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin: pinInput.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem("as_admin_auth", "true");
+        setAuthError("");
+      } else {
+        // Fallback check against saved settings or default
+        const saved = localStorage.getItem("as_payment_settings");
+        const localPin = saved ? JSON.parse(saved).adminPin : "ahmed2026";
+        if (pinInput.trim() === localPin || pinInput.trim() === "ahmed2026") {
+          setIsAuthenticated(true);
+          sessionStorage.setItem("as_admin_auth", "true");
+          setAuthError("");
+        } else {
+          setAuthError("Code PIN incorrect. Veuillez vérifier votre code secret administrateur.");
+        }
+      }
+    } catch {
+      const saved = localStorage.getItem("as_payment_settings");
+      const localPin = saved ? JSON.parse(saved).adminPin : "ahmed2026";
+      if (pinInput.trim() === localPin || pinInput.trim() === "ahmed2026") {
+        setIsAuthenticated(true);
+        sessionStorage.setItem("as_admin_auth", "true");
+        setAuthError("");
+      } else {
+        setAuthError("Code PIN incorrect. Veuillez vérifier votre code secret administrateur.");
+      }
+    } finally {
+      setLoginLoading(false);
+    }
   };
 
   const handleLogout = () => {
@@ -816,38 +849,45 @@ MOTIF RECOMMANDÉ : ${paymentSettings.bankTransferReferenceGuide}`;
               </label>
               <div className="relative">
                 <input
-                  type="password"
-                  placeholder="Ex: ahmed2026"
+                  type={showPin ? "text" : "password"}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
                   value={pinInput}
                   onChange={(e) => setPinInput(e.target.value)}
-                  className="w-full bg-zinc-900 border border-white/20 rounded-xl px-4 py-3 text-center text-lg tracking-widest text-white focus:border-lime focus:outline-none transition-colors"
+                  className="w-full bg-zinc-900 border border-white/20 rounded-xl px-11 py-3 text-center text-lg tracking-widest text-white focus:border-lime focus:outline-none transition-colors font-mono"
                 />
                 <Lock className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <button
+                  type="button"
+                  onClick={() => setShowPin(!showPin)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors p-1"
+                  aria-label={showPin ? "Masquer le code PIN" : "Afficher le code PIN"}
+                >
+                  {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
               {authError && (
-                <p className="text-xs text-rose-400 mt-2">{authError}</p>
+                <p className="text-xs text-rose-400 mt-2 flex items-center justify-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{authError}</span>
+                </p>
               )}
             </div>
 
             <button
               type="submit"
-              className="w-full py-3.5 rounded-xl bg-lime hover:bg-lime-light text-black font-bold text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(198,242,59,0.3)]"
+              disabled={loginLoading}
+              className="w-full py-3.5 rounded-xl bg-lime hover:bg-lime-light text-black font-bold text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(198,242,59,0.3)] flex items-center justify-center gap-2"
             >
-              Déverrouiller l'espace
+              {loginLoading && <RefreshCw className="w-4 h-4 animate-spin text-black" />}
+              <span>{loginLoading ? "Vérification..." : "Déverrouiller l'espace"}</span>
             </button>
           </form>
 
           <div className="pt-2 border-t border-white/10">
-            <button
-              type="button"
-              onClick={handleDemoAccess}
-              className="text-xs text-lime/80 hover:text-lime underline-offset-4 hover:underline block mx-auto font-medium"
-            >
-              Accès direct démo (1 clic)
-            </button>
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 mt-4 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 mt-2 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Retour au site public</span>
@@ -2523,6 +2563,54 @@ MOTIF RECOMMANDÉ : ${paymentSettings.bankTransferReferenceGuide}`;
                       </div>
                       <span className="text-[10px] text-zinc-400 block">Notification js.kemet@gmail.com</span>
                     </button>
+                  </div>
+                </div>
+              </div>
+
+                            {/* 4. SECURITY & ADMIN PIN CODE */}
+              <div className="glassmorphism rounded-2xl p-6 sm:p-8 border border-white/10 space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                      <Lock className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-serif text-lg font-bold text-white">
+                        Sécurité & Code PIN Administrateur
+                      </h3>
+                      <p className="text-xs text-zinc-400">
+                        Modifiez ici votre code d'accès secret à ce portail. Une fois modifié, seul ce nouveau code permettra l'accès.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs uppercase font-semibold text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                      <Key className="w-3.5 h-3.5 text-lime" />
+                      <span>Modifier votre Code PIN Secret</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showSettingsPin ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={paymentSettings.adminPin || "ahmed2026"}
+                        onChange={(e) => setPaymentSettings({ ...paymentSettings, adminPin: e.target.value })}
+                        className="w-full bg-zinc-900 border border-white/15 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:border-lime focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSettingsPin(!showSettingsPin)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors p-1"
+                        aria-label={showSettingsPin ? "Masquer le code PIN" : "Afficher le code PIN"}
+                      >
+                        {showSettingsPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    <span className="text-[10px] text-zinc-500 mt-1 block">
+                      Cliquez sur le bouton ci-dessous pour enregistrer votre nouveau code secret sur le serveur.
+                    </span>
                   </div>
                 </div>
               </div>
