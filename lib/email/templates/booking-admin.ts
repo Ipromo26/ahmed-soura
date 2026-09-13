@@ -1,5 +1,5 @@
 import { BookingEmailData } from "../types";
-import { renderEmailWrapper } from "./styles";
+import { renderEmailWrapper, getAdminUrl, getSiteBaseUrl } from "./styles";
 
 function formatSessionDate(dateStr: string, locale: "fr" | "en" = "fr"): string {
   try {
@@ -40,7 +40,7 @@ export function renderAdminBookingNotification(data: BookingEmailData): { subjec
         Nouvelle Réservation Enregistrée 🎭
       </h1>
       <p style="font-size: 13px; color: #a1a1aa; margin: 0;">
-        Un élève vient d'enregistrer une séance et son reçu a été généré avec succès depuis le site officiel <strong>ahmed-soura.fr</strong>.
+        Un élève vient d'enregistrer une séance et son reçu a été généré avec succès depuis le site officiel <strong>${getSiteBaseUrl().replace('https://', '')}</strong>.
       </p>
     </div>
 
@@ -128,7 +128,7 @@ export function renderAdminBookingNotification(data: BookingEmailData): { subjec
           </a>
         </td>
         <td style="padding: 0 0 0 6px; width: 50%;">
-          <a href="https://ahmed-soura.fr/admin"
+          <a href="${getAdminUrl()}"
              style="display: block; text-align: center; background-color: #c6f23b; color: #000000; font-weight: 700; font-size: 12px; padding: 12px; border-radius: 12px; text-decoration: none;">
             ⚙️ Ouvrir Admin
           </a>

@@ -98,11 +98,11 @@ export function renderEmailWrapper(content: string, preheaderText: string = ""):
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
                 <tr>
                   <td style="padding: 0 8px;">
-                    <a href="https://ahmed-soura.fr" style="font-size: 11px; color: #c6f23b; text-decoration: none; font-weight: 600;">Site Officiel</a>
+                    <a href="${getSiteBaseUrl()}" style="font-size: 11px; color: #c6f23b; text-decoration: none; font-weight: 600;">Site Officiel</a>
                   </td>
                   <td style="color: #3f3f46; font-size: 11px;">·</td>
                   <td style="padding: 0 8px;">
-                    <a href="https://ahmed-soura.fr/cours" style="font-size: 11px; color: #a1a1aa; text-decoration: none;">Cours & Stages</a>
+                    <a href="${getSiteBaseUrl()}/cours" style="font-size: 11px; color: #a1a1aa; text-decoration: none;">Cours & Stages</a>
                   </td>
                   <td style="color: #3f3f46; font-size: 11px;">·</td>
                   <td style="padding: 0 8px;">
@@ -123,4 +123,18 @@ export function renderEmailWrapper(content: string, preheaderText: string = ""):
   </table>
 </body>
 </html>`;
+}
+
+export function getSiteBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL.startsWith("http")) {
+    return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
+  }
+  if (process.env.URL && process.env.URL.startsWith("http")) {
+    return process.env.URL.replace(/\/$/, "");
+  }
+  return "https://ahmed-soura.netlify.app";
+}
+
+export function getAdminUrl(): string {
+  return `${getSiteBaseUrl()}/admin`;
 }

@@ -1,5 +1,5 @@
 import { ContactEmailData } from "../types";
-import { renderEmailWrapper } from "./styles";
+import { renderEmailWrapper, getAdminUrl, getSiteBaseUrl } from "./styles";
 
 export function renderAdminContactNotification(data: ContactEmailData): { subject: string; html: string; text: string } {
   const subject = `📬 [Yongonlon Contact] Message de ${data.name} (${data.category || "Général"}) - Réf: ${data.messageId}`;
@@ -14,7 +14,7 @@ export function renderAdminContactNotification(data: ContactEmailData): { subjec
         Message Reçu depuis le Site Yongonlon ✉️
       </h1>
       <p style="font-size: 13px; color: #a1a1aa; margin: 0;">
-        Un visiteur vient de soumettre le formulaire de contact officiel.
+        Un visiteur vient de soumettre le formulaire de contact officiel sur <strong>${getSiteBaseUrl().replace('https://', '')}</strong>.
       </p>
     </div>
 
@@ -63,16 +63,22 @@ export function renderAdminContactNotification(data: ContactEmailData): { subjec
     <!-- Actions -->
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px;">
       <tr>
-        <td style="padding: 0 6px 0 0; width: 50%;">
+        <td style="padding: 0 4px 0 0; width: 33%;">
           <a href="mailto:${data.email}?subject=${encodeURIComponent(`Re: Votre message auprès de la Compagnie Ahmed Soura / Yongonlon (Réf: ${data.messageId})`)}"
-             style="display: block; text-align: center; background-color: #c6f23b; color: #000000; font-weight: 700; font-size: 12px; padding: 12px; border-radius: 12px; text-decoration: none;">
-            ✉️ Répondre par Email
+             style="display: block; text-align: center; background-color: #c6f23b; color: #000000; font-weight: 700; font-size: 12px; padding: 12px 6px; border-radius: 12px; text-decoration: none;">
+            ✉️ Répondre
           </a>
         </td>
-        <td style="padding: 0 0 0 6px; width: 50%;">
+        <td style="padding: 0 4px; width: 33%;">
           <a href="https://wa.me/491637173662"
-             style="display: block; text-align: center; background-color: #25D366; color: #ffffff; font-weight: 700; font-size: 12px; padding: 12px; border-radius: 12px; text-decoration: none;">
-            💬 WhatsApp Ahmed
+             style="display: block; text-align: center; background-color: #25D366; color: #ffffff; font-weight: 700; font-size: 12px; padding: 12px 6px; border-radius: 12px; text-decoration: none;">
+            💬 WhatsApp
+          </a>
+        </td>
+        <td style="padding: 0 0 0 4px; width: 34%;">
+          <a href="${getAdminUrl()}"
+             style="display: block; text-align: center; background-color: #27272a; border: 1px solid #3f3f46; color: #ffffff; font-weight: 700; font-size: 12px; padding: 12px 6px; border-radius: 12px; text-decoration: none;">
+            ⚙️ Ouvrir Admin
           </a>
         </td>
       </tr>
