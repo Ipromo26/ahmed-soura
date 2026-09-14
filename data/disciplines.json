@@ -1,0 +1,47 @@
+[
+  {
+    "id": "danse-afro-contemporaine",
+    "title": "Danse Afro-Contemporaine",
+    "category": "Spécialité & Signature",
+    "duration": "90 min",
+    "price": "32 €",
+    "level": "Tous niveaux",
+    "desc": "La signature d'Ahmed Soura : synthèse organique des rythmes ouest-africains et de l'abstraction contemporaine."
+  },
+  {
+    "id": "corps-energie",
+    "title": "Masterclass Intensive « Le Corps Énergie »",
+    "category": "Pédagogie Avancée",
+    "duration": "180 min",
+    "price": "45 €",
+    "level": "Intermédiaire / Professionnel",
+    "desc": "Approche physique et respiratoire pour libérer la puissance du geste scénique."
+  },
+  {
+    "id": "danses-traditionnelles",
+    "title": "Danses traditionnelles du Burkina Faso",
+    "category": "Tradition & Racines",
+    "duration": "120 min",
+    "price": "30 €",
+    "level": "Tous niveaux",
+    "desc": "Immersion dans les pas, chants et polyrythmies des terroirs burkinabè avec percussionnistes live."
+  },
+  {
+    "id": "coaching-particulier",
+    "title": "Cours privés & Accompagnement sur-mesure",
+    "category": "Individuel",
+    "duration": "60 à 90 min",
+    "price": "70 €",
+    "level": "Sur-mesure",
+    "desc": "Séance personnalisée axée sur la technique corporelle, la posture et la préparation à la scène."
+  },
+  {
+    "id": "ateliers-collectifs",
+    "title": "Ateliers collectifs réguliers",
+    "category": "Collectif",
+    "duration": "90 min",
+    "price": "22 €",
+    "level": "Intermédiaire / Avancé",
+    "desc": "Pratique hebdomadaire en studio mêlant écoute du groupe et libération des énergies corporelles."
+  }
+]

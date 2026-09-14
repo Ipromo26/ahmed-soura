@@ -59,6 +59,8 @@ interface BookingContextType {
   deleteDiscipline: (id: string) => void;
   getSlotsByDate: (date: string) => AvailabilitySlot[];
   refreshServerBookings: () => Promise<void>;
+  refreshServerSlots: () => Promise<void>;
+  refreshServerDisciplines: () => Promise<void>;
 }
 
 const defaultDisciplines: DanceDiscipline[] = [
@@ -307,7 +309,44 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
 
     refreshServerBookings();
+    refreshServerSlots();
+    refreshServerDisciplines();
   }, []);
+
+  const refreshServerSlots = async () => {
+    try {
+      const res = await fetch("/api/slots");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.slots) && data.slots.length > 0) {
+          setSlots(data.slots);
+          try {
+            localStorage.setItem("as_slots_data", JSON.stringify(data.slots));
+          } catch (e) {}
+        }
+      }
+    } catch (e) {
+      console.warn("[SLOTS SERVER SYNC ERROR]", e);
+    }
+  };
+
+  const refreshServerDisciplines = async () => {
+    try {
+      const res = await fetch("/api/disciplines");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.disciplines) && data.disciplines.length > 0) {
+          setDisciplines(data.disciplines);
+          try {
+            localStorage.setItem("as_disciplines_data", JSON.stringify(data.disciplines));
+          } catch (e) {}
+        }
+      }
+    } catch (e) {
+      console.warn("[DISCIPLINES SERVER SYNC ERROR]", e);
+    }
+  };
+
 
   // Save to localStorage whenever state changes
   const persistSlots = (newSlots: AvailabilitySlot[]) => {
@@ -315,6 +354,11 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     try {
       localStorage.setItem("as_slots_data", JSON.stringify(newSlots));
     } catch (e) {}
+    fetch("/api/slots", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slots: newSlots }),
+    }).catch((err) => console.warn("[SLOTS SERVER PERSIST ERROR]", err));
   };
 
   const persistBookings = (newBookings: Booking[]) => {
@@ -329,6 +373,11 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     try {
       localStorage.setItem("as_disciplines_data", JSON.stringify(newDisciplines));
     } catch (e) {}
+    fetch("/api/disciplines", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ disciplines: newDisciplines }),
+    }).catch((err) => console.warn("[DISCIPLINES SERVER PERSIST ERROR]", err));
   };
 
   const addSlot = (slot: Omit<AvailabilitySlot, "id" | "bookedCount">) => {
@@ -401,10 +450,21 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
     }
     persistBookings(bookings.filter((b) => b.id !== id));
+    fetch("/api/bookings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "delete", bookingId: id }),
+    }).catch((err) => console.warn("[BOOKING DELETE SERVER SYNC ERROR]", err));
   };
 
   const updateBookingStatus = (id: string, status: "pending" | "confirmed" | "cancelled") => {
-    persistBookings(bookings.map((b) => (b.id === id ? { ...b, status } : b)));
+    const updated = bookings.map((b) => (b.id === id ? { ...b, status } : b));
+    persistBookings(updated);
+    fetch("/api/bookings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "update_status", bookingId: id, status }),
+    }).catch((err) => console.warn("[BOOKING STATUS SERVER SYNC ERROR]", err));
   };
 
   const addDiscipline = (disc: Omit<DanceDiscipline, "id">) => {
@@ -452,6 +512,8 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         deleteDiscipline,
         getSlotsByDate,
         refreshServerBookings,
+        refreshServerSlots,
+        refreshServerDisciplines,
       }}
     >
       {children}

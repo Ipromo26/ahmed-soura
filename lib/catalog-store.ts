@@ -237,6 +237,11 @@ export function saveBoutiqueProducts(products: ProductItem[]) {
   try {
     localStorage.setItem("as_boutique_products", JSON.stringify(products));
     window.dispatchEvent(new Event("as_products_updated"));
+    fetch("/api/catalog", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "update_products", products }),
+    }).catch((e) => console.warn("[CATALOG SERVER PERSIST ERROR]", e));
   } catch (e) {
     console.error("Failed to save products to localStorage", e);
   }
@@ -261,7 +266,50 @@ export function saveGalleryItems(items: GalleryItem[]) {
   try {
     localStorage.setItem("as_gallery_items", JSON.stringify(items));
     window.dispatchEvent(new Event("as_gallery_updated"));
+    fetch("/api/catalog", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "update_gallery", gallery: items }),
+    }).catch((e) => console.warn("[GALLERY SERVER PERSIST ERROR]", e));
   } catch (e) {
     console.error("Failed to save gallery items to localStorage", e);
   }
+}
+
+
+export async function syncCatalogFromServer(): Promise<{ products: ProductItem[]; gallery: GalleryItem[] }> {
+  try {
+    const res = await fetch("/api/catalog");
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        if (Array.isArray(data.products) && data.products.length > 0) {
+          if (typeof window !== "undefined") {
+            try {
+              localStorage.setItem("as_boutique_products", JSON.stringify(data.products));
+            } catch (e) {}
+            window.dispatchEvent(new Event("as_products_updated"));
+          }
+        }
+        if (Array.isArray(data.gallery) && data.gallery.length > 0) {
+          if (typeof window !== "undefined") {
+            try {
+              localStorage.setItem("as_gallery_items", JSON.stringify(data.gallery));
+            } catch (e) {}
+            window.dispatchEvent(new Event("as_gallery_updated"));
+          }
+        }
+        return {
+          products: data.products || DEFAULT_PRODUCTS,
+          gallery: data.gallery || DEFAULT_GALLERY_ITEMS,
+        };
+      }
+    }
+  } catch (err) {
+    console.warn("[CATALOG SYNC ERROR]", err);
+  }
+  return {
+    products: loadBoutiqueProducts(),
+    gallery: loadGalleryItems(),
+  };
 }

@@ -7,7 +7,7 @@ import { Footer } from "@/components/Footer";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCart } from "@/context/CartContext";
 import { ProductItem } from "@/types/i18n";
-import { loadBoutiqueProducts } from "@/lib/catalog-store";
+import { loadBoutiqueProducts, syncCatalogFromServer } from "@/lib/catalog-store";
 import { useEffect } from "react";
 import {
   ArrowLeft,
@@ -39,6 +39,11 @@ export default function BoutiquePage() {
 
   useEffect(() => {
     setProductsList(loadBoutiqueProducts());
+    syncCatalogFromServer().then((data) => {
+      if (data.products && data.products.length > 0) {
+        setProductsList(data.products);
+      }
+    });
     const handler = () => {
       setProductsList(loadBoutiqueProducts());
     };

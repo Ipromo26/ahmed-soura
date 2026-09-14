@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { loadGalleryItems } from "@/lib/catalog-store";
+import { loadGalleryItems, syncCatalogFromServer } from "@/lib/catalog-store";
 import { GalleryItem } from "@/types/i18n";
 import Image from "next/image";
 import { Navbar } from "@/components/Navbar";
@@ -25,6 +25,11 @@ export default function GaleriePage() {
 
   useEffect(() => {
     setGalleryList(loadGalleryItems());
+    syncCatalogFromServer().then((data) => {
+      if (data.gallery && data.gallery.length > 0) {
+        setGalleryList(data.gallery);
+      }
+    });
     const handler = () => {
       setGalleryList(loadGalleryItems());
     };

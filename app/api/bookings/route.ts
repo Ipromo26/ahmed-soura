@@ -3,7 +3,6 @@ import { sendBookingEmails } from "@/lib/email/mailer";
 import fs from "fs";
 import path from "path";
 
-// In-memory fallback in case filesystem is read-only (e.g. some serverless environments)
 let memoryBookings: any[] = [];
 
 function getBookingsFilePath(): string {
@@ -27,18 +26,24 @@ function loadServerBookings(): any[] {
   return memoryBookings;
 }
 
-function saveServerBooking(booking: any): void {
-  memoryBookings = [booking, ...memoryBookings.filter((b) => b.id !== booking.id)];
+function saveServerBookingsList(bookings: any[]): void {
+  memoryBookings = bookings;
   try {
     const file = getBookingsFilePath();
     const dir = path.dirname(file);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFileSync(file, JSON.stringify(memoryBookings, null, 2), "utf8");
+    fs.writeFileSync(file, JSON.stringify(bookings, null, 2), "utf8");
   } catch (e) {
     console.warn("[BOOKING STORE WRITE ERROR, FALLBACK TO MEMORY]", e);
   }
+}
+
+function saveServerBooking(booking: any): void {
+  const current = loadServerBookings();
+  const updated = [booking, ...current.filter((b) => b.id !== booking.id)];
+  saveServerBookingsList(updated);
 }
 
 export async function GET() {
@@ -55,6 +60,33 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
+    // 1. Action: update status from admin
+    if (body.action === "update_status" && body.bookingId && body.status) {
+      const current = loadServerBookings();
+      const updated = current.map((b) =>
+        b.id === body.bookingId ? { ...b, status: body.status } : b
+      );
+      saveServerBookingsList(updated);
+      return NextResponse.json({
+        success: true,
+        message: `Statut de la réservation ${body.bookingId} mis à jour vers ${body.status}`,
+        bookings: updated,
+      });
+    }
+
+    // 2. Action: delete booking from admin
+    if (body.action === "delete" && body.bookingId) {
+      const current = loadServerBookings();
+      const updated = current.filter((b) => b.id !== body.bookingId);
+      saveServerBookingsList(updated);
+      return NextResponse.json({
+        success: true,
+        message: `Réservation ${body.bookingId} supprimée avec succès`,
+        bookings: updated,
+      });
+    }
+
+    // 3. New booking creation
     if (!body.clientName || !body.clientPhone || !body.date || !body.discipline) {
       return NextResponse.json(
         { error: "Champs obligatoires manquants: clientName, clientPhone, date, discipline." },
@@ -62,7 +94,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Keep client-generated ref if valid (e.g. AS-XXXXXX), or generate a new one
     const generatedId = body.bookingId && /^AS-\d{6}$/.test(body.bookingId) 
       ? body.bookingId 
       : "AS-" + Math.floor(100000 + Math.random() * 900000);
@@ -90,10 +121,9 @@ export async function POST(req: NextRequest) {
       createdAt: new Date().toISOString(),
     };
 
-    // 1. Persist booking to server store
     saveServerBooking(bookingData);
 
-    // 2. Dispatch bilingual emails (Official Receipt to Client + Alert to Ahmed Soura / js.kemet@gmail.com)
+    // Dispatch emails in background
     let emailDispatch = null;
     try {
       emailDispatch = await sendBookingEmails({
@@ -127,5 +157,25 @@ export async function POST(req: NextRequest) {
       { error: "Erreur lors de l'enregistrement de la réservation: " + err.message },
       { status: 500 }
     );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    if (!id) {
+      return NextResponse.json({ error: "Identifiant id requis" }, { status: 400 });
+    }
+    const current = loadServerBookings();
+    const updated = current.filter((b) => b.id !== id);
+    saveServerBookingsList(updated);
+    return NextResponse.json({
+      success: true,
+      message: `Réservation ${id} supprimée`,
+      bookings: updated,
+    });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }

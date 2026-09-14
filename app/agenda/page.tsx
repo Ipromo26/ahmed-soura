@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useLanguage } from "@/context/LanguageContext";
+import { useBooking } from "@/context/BookingContext";
 import {
   Calendar,
   Clock,
@@ -14,11 +15,17 @@ import {
   Sparkles,
   Filter,
   CheckCircle2,
+  Users,
+  Flame,
 } from "lucide-react";
 
 export default function AgendaPage() {
   const { t } = useLanguage();
+  const { slots } = useBooking();
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
+
+  // Sort open future slots
+  const activeLiveSlots = slots.filter((s) => s.isOpen);
 
   const filteredEvents = t.agendaPage.events.filter((ev) => {
     if (selectedFilter === "all") return true;
@@ -56,6 +63,92 @@ export default function AgendaPage() {
               {t.agendaPage.heroSubtitle}
             </p>
           </div>
+
+          {/* Live Studio Booking Slots (Synchronized in real-time with Admin Calendar) */}
+          {activeLiveSlots.length > 0 && (
+            <div className="mt-16 pt-12 border-t border-white/10 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-lime mb-2">
+                    <Flame className="w-3.5 h-3.5" />
+                    <span>Sessions Studio & Ateliers en Direct</span>
+                  </div>
+                  <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white">
+                    Créneaux ouverts aux inscriptions
+                  </h2>
+                </div>
+                <Link
+                  href="/reservation"
+                  className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-lime hover:underline"
+                >
+                  <span>Voir le planning complet & réserver</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {activeLiveSlots.map((slot) => {
+                  const remaining = Math.max(0, slot.maxCapacity - slot.bookedCount);
+                  return (
+                    <div
+                      key={slot.id}
+                      className="p-5 rounded-xl bg-zinc-900/60 border border-white/10 hover:border-lime/40 transition-all flex flex-col justify-between group"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-mono font-bold text-lime px-2.5 py-1 rounded bg-lime/10 border border-lime/20">
+                            {slot.date}
+                          </span>
+                          <span
+                            className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                              remaining <= 2
+                                ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                                : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                            }`}
+                          >
+                            {remaining === 0 ? "Complet" : `${remaining} place${remaining > 1 ? "s" : ""} disponible${remaining > 1 ? "s" : ""}`}
+                          </span>
+                        </div>
+
+                        <h3 className="font-serif text-lg font-bold text-white group-hover:text-lime transition-colors">
+                          {slot.disciplineTitle}
+                        </h3>
+
+                        <div className="space-y-1.5 text-xs text-zinc-400">
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                            <span>{slot.startTime} - {slot.endTime}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                            <span className="truncate">{slot.location}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Users className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                            <span>Niveau : {slot.level}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-between">
+                        <span className="text-xs text-zinc-400 font-mono">
+                          Capacité : {slot.bookedCount}/{slot.maxCapacity}
+                        </span>
+                        <Link
+                          href="/reservation"
+                          className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-lime group-hover:translate-x-1 transition-transform"
+                        >
+                          <span>Réserver</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
         </div>
       </section>
 

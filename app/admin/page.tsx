@@ -50,6 +50,7 @@ import { ImageCropperModal } from "@/components/ImageCropperModal";
 import { ProductItem, GalleryItem } from "@/types/i18n";
 import {
   loadBoutiqueProducts,
+  syncCatalogFromServer,
   saveBoutiqueProducts,
   loadGalleryItems,
   saveGalleryItems,
@@ -96,10 +97,22 @@ export default function AdminPage() {
     updateDiscipline,
     deleteDiscipline,
     refreshServerBookings,
+    refreshServerSlots,
+    refreshServerDisciplines,
   } = useBooking();
 
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
+  // Auto-sync bookings from server every 10s when authenticated
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const interval = setInterval(() => {
+      refreshServerBookings();
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated, refreshServerBookings]);
+
   const [pinInput, setPinInput] = useState<string>("");
   const [showPin, setShowPin] = useState<boolean>(false);
   const [showSettingsPin, setShowSettingsPin] = useState<boolean>(false);
@@ -434,6 +447,10 @@ MOTIF RECOMMANDÉ : ${paymentSettings.bankTransferReferenceGuide}`;
   useEffect(() => {
     setProducts(loadBoutiqueProducts());
     setGalleryItems(loadGalleryItems());
+    syncCatalogFromServer().then((data) => {
+      if (data.products) setProducts(data.products);
+      if (data.gallery) setGalleryItems(data.gallery);
+    });
   }, []);
 
   // Boutique Handlers
@@ -996,7 +1013,7 @@ MOTIF RECOMMANDÉ : ${paymentSettings.bankTransferReferenceGuide}`;
         {/* Navigation Tabs */}
         <div className="flex items-center gap-2 border-b border-white/10 pb-3 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
           <button
-            onClick={() => setActiveTab("calendar")}
+            onClick={() => { setActiveTab("calendar"); refreshServerSlots(); }}
             className={"px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs uppercase font-bold tracking-wider transition-all flex items-center gap-2 whitespace-nowrap shrink-0 " +
               (activeTab === "calendar"
                 ? "bg-lime text-black shadow-[0_0_20px_rgba(198,242,59,0.3)]"
@@ -1007,7 +1024,7 @@ MOTIF RECOMMANDÉ : ${paymentSettings.bankTransferReferenceGuide}`;
           </button>
 
           <button
-            onClick={() => setActiveTab("bookings")}
+            onClick={() => { setActiveTab("bookings"); refreshServerBookings(); }}
             className={"px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs uppercase font-bold tracking-wider transition-all flex items-center gap-2 whitespace-nowrap shrink-0 " +
               (activeTab === "bookings"
                 ? "bg-lime text-black shadow-[0_0_20px_rgba(198,242,59,0.3)]"
@@ -1023,7 +1040,7 @@ MOTIF RECOMMANDÉ : ${paymentSettings.bankTransferReferenceGuide}`;
           </button>
 
           <button
-            onClick={() => setActiveTab("disciplines")}
+            onClick={() => { setActiveTab("disciplines"); refreshServerDisciplines(); }}
             className={"px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs uppercase font-bold tracking-wider transition-all flex items-center gap-2 whitespace-nowrap shrink-0 " +
               (activeTab === "disciplines"
                 ? "bg-lime text-black shadow-[0_0_20px_rgba(198,242,59,0.3)]"
@@ -1034,7 +1051,7 @@ MOTIF RECOMMANDÉ : ${paymentSettings.bankTransferReferenceGuide}`;
           </button>
 
           <button
-            onClick={() => setActiveTab("products")}
+            onClick={() => { setActiveTab("products"); syncCatalogFromServer().then(d => { if (d.products) setProducts(d.products); }); }}
             className={"px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs uppercase font-bold tracking-wider transition-all flex items-center gap-2 whitespace-nowrap shrink-0 " +
               (activeTab === "products"
                 ? "bg-lime text-black shadow-[0_0_20px_rgba(198,242,59,0.3)]"
@@ -1045,7 +1062,7 @@ MOTIF RECOMMANDÉ : ${paymentSettings.bankTransferReferenceGuide}`;
           </button>
 
           <button
-            onClick={() => setActiveTab("gallery")}
+            onClick={() => { setActiveTab("gallery"); syncCatalogFromServer().then(d => { if (d.gallery) setGalleryItems(d.gallery); }); }}
             className={"px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs uppercase font-bold tracking-wider transition-all flex items-center gap-2 whitespace-nowrap shrink-0 " +
               (activeTab === "gallery"
                 ? "bg-lime text-black shadow-[0_0_20px_rgba(198,242,59,0.3)]"

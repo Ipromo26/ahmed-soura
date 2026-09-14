@@ -1,0 +1,275 @@
+{
+  "products": [
+    {
+      "id": "tshirt-typo-noir",
+      "title": "T-shirt Typographique Yongonlon — Noir",
+      "category": "tshirts",
+      "categoryLabel": "T-shirts",
+      "price": 49,
+      "formattedPrice": "49 €",
+      "desc": "T-shirt unisexe coupe décontractée arborant la matrice typographique 3×3 Yongonlon. Sérigraphie artisanale à l'encre à l'eau sur fond noir.",
+      "details": [
+        "100% Coton peigné biologique ring-spun 220g",
+        "Impression sérigraphique écologique sans solvants",
+        "Col rond épais double piqûre",
+        "Design original Atelier Yongonlon Berlin"
+      ],
+      "tag": "Essentiel",
+      "image": "/images/products/tshirt-noir.jpg",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        {
+          "name": "Noir Profond",
+          "hex": "#0c0c0c"
+        }
+      ],
+      "inStock": true
+    },
+    {
+      "id": "tshirt-typo-blanc",
+      "title": "T-shirt Typographique Yongonlon — Blanc",
+      "category": "tshirts",
+      "categoryLabel": "T-shirts",
+      "price": 35,
+      "formattedPrice": "35 €",
+      "desc": "Matrice 3×3 noire épurée sérigraphiée sur coton bio lourd blanc. Pièce signature Yongonlon.",
+      "details": [
+        "100% Coton biologique lourd 250g",
+        "Sérigraphie noire mate haute définition",
+        "Coutures renforcées épaules et col",
+        "Coupe unisexe droite confortable"
+      ],
+      "tag": "Signature",
+      "image": "/images/products/tshirt-blanc.jpg",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        {
+          "name": "Blanc Pur",
+          "hex": "#ffffff"
+        }
+      ],
+      "inStock": true
+    },
+    {
+      "id": "tshirt-solo166",
+      "title": "T-shirt Scène « Solo 166 » — Collector",
+      "category": "tshirts",
+      "categoryLabel": "T-shirts",
+      "price": 42,
+      "formattedPrice": "42 €",
+      "desc": "Visuel vert lime emblématique de la pièce solo primée « 166 » imprimé sur fond noir. Édition collector numérotée.",
+      "details": [
+        "Impression numérique DTG haute résolution",
+        "Coton biologique certifié GOTS 200g",
+        "Visuel exclusif photographié par Jo Grabowski",
+        "Chaque t-shirt est numéroté"
+      ],
+      "tag": "Édition Collector",
+      "image": "/images/products/tshirt-solo166.jpg",
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        {
+          "name": "Noir Profond",
+          "hex": "#111111"
+        }
+      ],
+      "inStock": true,
+      "editionNotice": "Série limitée à 100 exemplaires"
+    },
+    {
+      "id": "tshirt-danser",
+      "title": "T-shirt Éco « Danser · Rassembler · Transmettre »",
+      "category": "tshirts",
+      "categoryLabel": "T-shirts",
+      "price": 32,
+      "formattedPrice": "32 €",
+      "desc": "Typographie signature au dos, devise fondatrice de l'association. Coton bio léger idéal pour la danse et le quotidien.",
+      "details": [
+        "100% Coton biologique léger 180g",
+        "Typographie signature brodée au dos",
+        "Coupe ajustée mixte",
+        "Teinture écologique certifiée OEKO-TEX"
+      ],
+      "tag": "Éco-responsable",
+      "image": "/images/products/tshirt-eco.jpg",
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        {
+          "name": "Noir Charbon",
+          "hex": "#181818"
+        },
+        {
+          "name": "Ivoire Naturel",
+          "hex": "#f5f2eb"
+        }
+      ],
+      "inStock": true
+    },
+    {
+      "id": "casquette-yon-berlin",
+      "title": "Casquette Brodée « YON » Studio Berlin",
+      "category": "casquettes",
+      "categoryLabel": "Casquettes",
+      "price": 30,
+      "formattedPrice": "30 €",
+      "desc": "Casquette 6 panneaux en sergé de coton avec boucle de serrage métallique gravée. Broderie 3D relief haute précision.",
+      "details": [
+        "100% Coton sergé premium",
+        "Broderie 3D haute définition sur le panneau avant",
+        "Attache arrière réglable en laiton vieilli",
+        "Bandeau anti-transpiration absorbant"
+      ],
+      "image": "/images/products/casquette-yon.jpg",
+      "colors": [
+        {
+          "name": "Noir Délicat",
+          "hex": "#1a1a1a"
+        },
+        {
+          "name": "Sable Kaki",
+          "hex": "#8c8272"
+        }
+      ],
+      "inStock": true
+    },
+    {
+      "id": "casquette-vintage-washed",
+      "title": "Casquette Vintage Washed Yongonlon",
+      "category": "casquettes",
+      "categoryLabel": "Casquettes",
+      "price": 28,
+      "formattedPrice": "28 €",
+      "desc": "Coton sergé délavé effet vintage avec logo Yongonlon brodé. Boucle métallique gravée au dos.",
+      "details": [
+        "Coton sergé washed effet usé naturel",
+        "Logo Yongonlon brodé ton sur ton",
+        "Visière pré-courbée",
+        "Taille unique ajustable"
+      ],
+      "tag": "Style Vintage",
+      "image": "/images/products/casquette-vintage.jpg",
+      "colors": [
+        {
+          "name": "Vert Olive Délavé",
+          "hex": "#6b7c5e"
+        },
+        {
+          "name": "Noir Washed",
+          "hex": "#2a2a2a"
+        }
+      ],
+      "inStock": true
+    },
+    {
+      "id": "casquette-166-lime",
+      "title": "Casquette Minimaliste « 166 » Noir & Vert Lime",
+      "category": "casquettes",
+      "categoryLabel": "Casquettes",
+      "price": 32,
+      "formattedPrice": "32 €",
+      "desc": "Édition studio minimale avec le chiffre emblématique « 166 » brodé en vert lime sur fond noir profond.",
+      "details": [
+        "Construction 5 panneaux structurée",
+        "Broderie vert lime (#c6f23b) contrastée",
+        "Fermeture snapback ajustable",
+        "Édition limitée Studio Berlin"
+      ],
+      "tag": "Édition Studio",
+      "image": "/images/products/casquette-166.jpg",
+      "colors": [
+        {
+          "name": "Noir & Lime",
+          "hex": "#111111"
+        }
+      ],
+      "inStock": true
+    }
+  ],
+  "gallery": [
+    {
+      "id": "photo-mu18xxwv",
+      "title": "Ahmed Soura Solo 2026 — Live Performance",
+      "category": "performance",
+      "src": "/images/ahmed-soura-green.jpg",
+      "credit": "Photo © Jo Grabowski",
+      "year": "2026"
+    },
+    {
+      "id": "photo-mu18bmks",
+      "title": "Ahmed Soura Solo 2026 — Live Performance",
+      "category": "performance",
+      "src": "/images/ahmed-soura-green.jpg",
+      "credit": "Photo © Jo Grabowski",
+      "year": "2026"
+    },
+    {
+      "id": "photo-mu188mva",
+      "title": "Ahmed Soura Solo 2026 — Live Performance",
+      "category": "performance",
+      "src": "/images/ahmed-soura-green.jpg",
+      "credit": "Photo © Jo Grabowski",
+      "year": "2026"
+    },
+    {
+      "id": "photo-1",
+      "src": "/images/ahmed-soura-green.jpg",
+      "title": "Solo sur scène — Tenue vert lime",
+      "category": "performance",
+      "credit": "Photo © Jo Grabowski",
+      "year": "2023"
+    },
+    {
+      "id": "photo-2",
+      "src": "/images/ahmed-soura-performance.jpg",
+      "title": "Présence et intensité scénique",
+      "category": "performance",
+      "credit": "Photo © Jo Grabowski",
+      "year": "2022"
+    },
+    {
+      "id": "photo-3",
+      "src": "/images/ahmed-soura-arched.jpg",
+      "title": "Flexion dorsale sculpturale sous projecteur",
+      "category": "performance",
+      "credit": "Photo officielle",
+      "year": "2021"
+    },
+    {
+      "id": "photo-4",
+      "src": "/images/ahmed-soura-hooded.jpg",
+      "title": "Mouvement sculptural contemporain",
+      "category": "portrait",
+      "credit": "Atelier Berlin",
+      "year": "2024"
+    },
+    {
+      "id": "photo-5",
+      "src": "/images/yongonlon-logo.jpg",
+      "title": "Identité graphique YONGONLON",
+      "category": "portrait",
+      "credit": "Yongonlon Archives",
+      "year": "2024"
+    }
+  ]
+}

@@ -1,5 +1,37 @@
 [
   {
+    "id": "AS-475189",
+    "clientName": "Clara Dupont",
+    "clientEmail": "clara.dupont.danse@gmail.com",
+    "clientPhone": "+33 6 12 34 56 78",
+    "discipline": "Danse Afro-Contemporaine",
+    "date": "2026-10-14",
+    "timeSlot": "18:30 - 20:00",
+    "level": "Tous niveaux",
+    "participants": 1,
+    "totalPrice": "25 € (1 × 25 €)",
+    "paymentStatus": "Règlement sur place au studio (Espèces / Carte) — Garanti",
+    "status": "confirmed",
+    "notes": "",
+    "createdAt": "2026-09-14T12:56:14.826Z"
+  },
+  {
+    "id": "AS-888793",
+    "clientName": "Sophie Laurent",
+    "clientEmail": "sophie.laurent.danse@gmail.com",
+    "clientPhone": "+33 6 12 34 56 78",
+    "discipline": "Danse Afro-Contemporaine",
+    "date": "2026-10-14",
+    "timeSlot": "18:30 - 20:00",
+    "level": "Tous niveaux",
+    "participants": 1,
+    "totalPrice": "25 € (1 × 25 €)",
+    "paymentStatus": "Règlement sur place au studio (Espèces / Carte) — Garanti",
+    "status": "confirmed",
+    "notes": "",
+    "createdAt": "2026-09-14T12:38:53.899Z"
+  },
+  {
     "id": "AS-262307",
     "clientName": "Nathalie Dubois",
     "clientEmail": "nathalie.dubois.danse@gmail.com",
